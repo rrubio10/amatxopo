@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OPE Osakidetza Test</title>
+  <meta name="theme-color" content="#b91c1c" />
+  <meta name="description" content="App de test para OPE Osakidetza con práctica por bloques, falladas y sincronización opcional." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#121a2b;
+      --panel-2:#17233b;
+      --border:#253552;
+      --text:#edf2f7;
+      --muted:#9fb0cc;
+      --accent:#dc2626;
+      --accent-2:#ef4444;
+      --good:#16a34a;
+      --bad:#dc2626;
+      --warn:#f59e0b;
+      --shadow:0 14px 40px rgba(0,0,0,.25);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#08101d 0%,#0b1220 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100%}
+    body{padding-bottom:64px}
+    a{color:inherit}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    header{
+      background:linear-gradient(135deg,#991b1b,#7f1d1d 60%,#111827);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
+    }
+    .hero{padding:28px 16px 22px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+    .brand h1{margin:0;font-size:clamp(1.5rem,3.2vw,2.2rem)}
+    .brand p{margin:6px 0 0;color:#fecaca;font-size:.95rem}
+    .top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .switch{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12)}
+    .switch input{accent-color:#fff;transform:scale(1.1)}
+    nav{position:sticky;top:0;z-index:9;background:rgba(11,18,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-row{display:flex;gap:8px;overflow:auto;padding:12px 16px}
+    .tab{border:none;background:var(--panel);color:var(--muted);padding:11px 14px;border-radius:999px;cursor:pointer;font-weight:700;white-space:nowrap;border:1px solid var(--border)}
+    .tab.active{background:var(--accent);color:white;border-color:transparent}
+    .grid{display:grid;gap:16px}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media (max-width:760px){.grid-2,.grid-3{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+    .card h2,.card h3{margin:0 0 10px}
+    .muted{color:var(--muted)}
+    .stat{background:var(--panel-2);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center}
+    .stat .n{font-size:2rem;font-weight:800;line-height:1;color:white}
+    .stat .l{margin-top:6px;color:var(--muted);font-size:.9rem}
+    .btn{border:none;border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer;background:#22314e;color:white}
+    .btn:hover{filter:brightness(1.06)}
+    .btn.primary{background:var(--accent)}
+    .btn.good{background:var(--good)}
+    .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .btn.warn{background:var(--warn);color:#111827}
+    .btn-row{display:flex;flex-wrap:wrap;gap:10px}
+    .pill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+    .pill-btn{padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-weight:800;text-align:left;cursor:pointer}
+    .pill-btn small{display:block;color:var(--muted);font-weight:600;margin-top:6px}
+    .select, .input{width:100%;background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:640px){.form-grid{grid-template-columns:1fr}}
+    .section{display:none}
+    .section.active{display:block}
+    .kicker{display:inline-flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .badge{display:inline-flex;padding:6px 10px;border-radius:999px;background:#23314e;border:1px solid var(--border);color:#dbeafe;font-size:.82rem;font-weight:800}
+    .progress{height:8px;background:#20304f;border-radius:999px;overflow:hidden;margin:14px 0}
+    .progress > div{height:100%;background:linear-gradient(90deg,var(--accent),#fb7185);width:0%}
+    .q-title{font-size:1.08rem;line-height:1.6;margin:0 0 16px;font-weight:700}
+    .opt-list{display:grid;gap:10px}
+    .opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;color:var(--text)}
+    .opt:hover{border-color:#3b82f6}
+    .opt .letter{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:10px;background:#23314e;font-weight:800;flex:0 0 28px}
+    .opt.correct{border-color:rgba(22,163,74,.7);background:rgba(22,163,74,.12)}
+    .opt.correct .letter{background:var(--good)}
+    .opt.wrong{border-color:rgba(220,38,38,.7);background:rgba(220,38,38,.12)}
+    .opt.wrong .letter{background:var(--bad)}
+    .opt[disabled]{cursor:default}
+    .feedback{display:none;margin-top:14px;padding:14px;border-radius:14px;background:#111827;border:1px solid var(--border);line-height:1.55}
+    .review-item{padding:14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--border);margin-top:10px}
+    .review-item h4{margin:0 0 8px;font-size:1rem}
+    .empty{text-align:center;color:var(--muted);padding:28px 12px}
+    .sync-ok{color:#86efac}
+    .sync-bad{color:#fca5a5}
+    .mini{font-size:.9rem}
+    .footer-note{font-size:.9rem;color:var(--muted);margin-top:10px;line-height:1.6}
+    #install-banner{display:none;position:fixed;left:16px;right:16px;bottom:16px;z-index:20;background:#111827;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
+    #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#111827;border:1px solid var(--border);padding:10px 14px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:30}
+    #toast.show{opacity:1}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap hero">
+      <div class="brand">
+        <h1>OPE Osakidetza Test</h1>
+        <p>PC + Android · bloques de 50 · falladas · shuffle de respuestas</p>
+      </div>
+      <div class="top-actions">
+        <label class="switch"><input type="checkbox" id="shuffle-toggle" /> <span>Shuffle respuestas</span></label>
+        <button class="btn ghost" id="install-btn" style="display:none">Instalar app</button>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <div class="wrap nav-row">
+      <button class="tab active" data-view="home">Inicio</button>
+      <button class="tab" data-view="random">Todo aleatorio</button>
+      <button class="tab" data-view="specific">Temario Específico</button>
+      <button class="tab" data-view="common">Común C2-C3-D-E</button>
+      <button class="tab" data-view="failed">Falladas</button>
+      <button class="tab" data-view="stats">Estadísticas</button>
+      <button class="tab" data-view="sync">Sync</button>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section id="home" class="section active">
+      <div class="grid grid-3">
+        <div class="stat"><div class="n" id="stat-answered">0</div><div class="l">Respondidas</div></div>
+        <div class="stat"><div class="n" id="stat-accuracy">0%</div><div class="l">Acierto global</div></div>
+        <div class="stat"><div class="n" id="stat-failed">0</div><div class="l">Pendientes en falladas</div></div>
+      </div>
+      <div class="grid grid-2" style="margin-top:16px">
+        <div class="card">
+          <h2>Empezar rápido</h2>
+          <div class="btn-row">
+            <button class="btn primary" onclick="startRandomQuiz(20)">20 aleatorias</button>
+            <button class="btn" onclick="startRandomQuiz(50)">50 aleatorias</button>
+            <button class="btn ghost" onclick="startFailedReview()">Repasar falladas</button>
+          </div>
+          <p class="footer-note">El modo shuffle cambia el orden visual de las respuestas en cada pregunta sin romper la correcta.</p>
+        </div>
+        <div class="card">
+          <h2>Qué hace esta versión</h2>
+          <ul class="muted mini" style="line-height:1.8; padding-left:18px; margin:0">
+            <li>Todo aleatorio de toda la batería.</li>
+            <li>Temario Específico en bloques de 50.</li>
+            <li>Común C2, C3, D y E en bloques de 50.</li>
+            <li>Almacén de falladas con repaso.</li>
+            <li>Sincronización opcional con Supabase.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="random" class="section">
+      <div class="card">
+        <h2>Todo aleatorio</h2>
+        <p class="muted">Mezcla las 500 preguntas y lanza una sesión nueva.</p>
+        <div class="form-grid" style="margin-top:14px">
+          <select id="random-count" class="select">
+            <option value="10">10 preguntas</option>
+            <option value="20" selected>20 preguntas</option>
+            <option value="50">50 preguntas</option>
+            <option value="100">100 preguntas</option>
+            <option value="500">Todas las preguntas</option>
+          </select>
+          <button class="btn primary" onclick="startRandomFromSelect()">Empezar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="specific" class="section">
+      <div class="card">
+        <h2>Temario Específico</h2>
+        <p class="muted">Bloques fijos de 50 preguntas.</p>
+        <div class="pill-grid" id="specific-blocks"></div>
+      </div>
+    </section>
+
+    <section id="common" class="section">
+      <div class="card">
+        <h2>COMÚN CATEGORÍAS C2, C3, D y E</h2>
+        <p class="muted">Bloques fijos de 50 preguntas.</p>
+        <div class="pill-grid" id="common-blocks"></div>
+      </div>
+    </section>
+
+    <section id="failed" class="section">
+      <div class="card">
+        <h2>Falladas</h2>
+        <p class="muted" id="failed-summary"></p>
+        <div class="btn-row">
+          <button class="btn primary" onclick="startFailedReview()">Repasar falladas</button>
+          <button class="btn ghost" onclick="clearFailed()">Vaciar falladas</button>
+        </div>
+        <div id="failed-list" style="margin-top:14px"></div>
+      </div>
+    </section>
+
+    <section id="stats" class="section">
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Resumen</h2>
+          <div class="grid grid-3">
+            <div class="stat"><div class="n" id="stats-total-attempts">0</div><div class="l">Intentos</div></div>
+            <div class="stat"><div class="n" id="stats-correct">0</div><div class="l">Aciertos</div></div>
+            <div class="stat"><div class="n" id="stats-wrong">0</div><div class="l">Fallos</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Progreso por banco</h2>
+          <div id="bank-stats" class="mini"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>Últimas sesiones</h2>
+        <div id="session-list"></div>
+      </div>
+    </section>
+
+    <section id="sync" class="section">
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Sincronización</h2>
+          <p class="muted">La app funciona sin cuenta. Si configuras Supabase, podrás iniciar sesión y compartir progreso entre PC y Android.</p>
+          <div id="sync-status" class="mini" style="margin:12px 0"></div>
+          <div class="form-grid">
+            <input id="auth-email" class="input" placeholder="Email" type="email" />
+            <input id="auth-password" class="input" placeholder="Contraseña" type="password" />
+          </div>
+          <div class="btn-row" style="margin-top:12px">
+            <button class="btn primary" onclick="signIn()">Entrar</button>
+            <button class="btn" onclick="signUp()">Crear cuenta</button>
+            <button class="btn ghost" onclick="syncNow()">Sincronizar ahora</button>
+            <button class="btn ghost" onclick="signOut()">Salir</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Copias locales</h2>
+          <div class="btn-row">
+            <button class="btn ghost" onclick="exportState()">Exportar progreso</button>
+            <label class="btn ghost" style="display:inline-flex;align-items:center;cursor:pointer">Importar progreso<input type="file" accept="application/json" hidden onchange="importState(event)"></label>
+          </div>
+          <p class="footer-note">Aunque no configures sync, siempre tendrás guardado local y copia exportable.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz" class="section">
+      <div class="card">
+        <div class="btn-row" style="justify-content:space-between;align-items:center">
+          <div class="kicker">
+            <span class="badge" id="quiz-bank-badge">Banco</span>
+            <span class="badge" id="quiz-mode-badge">Modo</span>
+          </div>
+          <button class="btn ghost" onclick="leaveQuiz()">Salir</button>
+        </div>
+        <div class="progress"><div id="quiz-progress"></div></div>
+        <div class="muted mini" id="quiz-counter">Pregunta 1 de 10</div>
+        <h3 id="quiz-question" class="q-title"></h3>
+        <div id="quiz-options" class="opt-list"></div>
+        <div id="quiz-feedback" class="feedback"></div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn primary" id="quiz-next" style="display:none" onclick="nextQuestion()">Siguiente</button>
+          <button class="btn good" id="quiz-finish" style="display:none" onclick="finishQuiz()">Finalizar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="section">
+      <div class="card">
+        <h2>Resultado</h2>
+        <div class="grid grid-3">
+          <div class="stat"><div class="n" id="result-score">0/0</div><div class="l">Aciertos</div></div>
+          <div class="stat"><div class="n" id="result-pct">0%</div><div class="l">Porcentaje</div></div>
+          <div class="stat"><div class="n" id="result-fails">0</div><div class="l">Errores</div></div>
+        </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn primary" onclick="showView('home')">Ir a inicio</button>
+          <button class="btn ghost" onclick="restartLastQuiz()">Repetir</button>
+        </div>
+        <div id="results-review" style="margin-top:14px"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="install-banner">
+    <div class="btn-row" style="justify-content:space-between;align-items:center">
+      <div>
+        <strong>Instala la app</strong>
+        <div class="mini muted">Así la tendrás como app en PC o Android.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="install-banner-btn">Instalar</button>
+        <button class="btn ghost" onclick="hideInstallBanner()">Ahora no</button>
+      </div>
+    </div>
+  </div>
+  <div id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./app-config.js"></script>
+  <script src="./questions-data.js"></script>
+  <script>
+    window.APP_CONFIG = window.APP_CONFIG || { SUPABASE_URL:'', SUPABASE_ANON_KEY:'' };
+
+    const STORAGE_KEY = 'ope_osakidetza_v3';
+    const DEFAULT_STATE = {
+      questionStats: {},
+      failedQuestionIds: [],
+      sessions: [],
+      settings: { shuffleAnswers: false },
+      lastQuizConfig: null,
+      lastSyncedAt: null
+    };
+
+    const BANK_LABELS = {
+      all: 'Toda la batería',
+      common: 'COMÚN C2, C3, D y E',
+      admin: 'Temario Específico',
+      failed: 'Falladas'
+    };
+
+    let state = loadState();
+    let currentQuiz = null;
+    let currentUser = null;
+    let supabaseClient = null;
+    let deferredInstallPrompt = null;
+
+    const byId = (id) => document.getElementById(id);
+    const views = [...document.querySelectorAll('.section')];
+    const tabs = [...document.querySelectorAll('.tab')];
+
+    init();
+
+    function init(){
+      bindTabs();
+      initQuestionBlocks();
+      bindSettings();
+      initSync();
+      refreshAllUi();
+      registerServiceWorker();
+      setupInstallPrompt();
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return structuredClone(DEFAULT_STATE);
+        return deepMerge(structuredClone(DEFAULT_STATE), JSON.parse(raw));
+      }catch(e){
+        console.error(e);
+        return structuredClone(DEFAULT_STATE);
+      }
+    }
+
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      refreshAllUi();
+    }
+
+    function deepMerge(base, extra){
+      if(typeof extra !== 'object' || extra === null) return base;
+      for(const [k,v] of Object.entries(extra)){
+        if(Array.isArray(v)) base[k] = v;
+        else if(v && typeof v === 'object') base[k] = deepMerge(base[k] && typeof base[k] === 'object' ? base[k] : {}, v);
+        else base[k] = v;
+      }
+      return base;
+    }
+
+    function bindTabs(){
+      tabs.forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
+    }
+
+    function showView(id){
+      views.forEach(v => v.classList.toggle('active', v.id === id));
+      tabs.forEach(t => t.classList.toggle('active', t.dataset.view === id));
+      if(id === 'failed') renderFailedSection();
+      if(id === 'stats') renderStats();
+      if(id === 'sync') renderSyncStatus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function initQuestionBlocks(){
+      renderBlockButtons('admin', byId('specific-blocks'));
+      renderBlockButtons('common', byId('common-blocks'));
+    }
+
+    function renderBlockButtons(bank, container){
+      const questions = QUESTIONS.filter(q => q.bank === bank);
+      const blocks = [...new Map(questions.map(q => [q.block, q])).values()];
+      container.innerHTML = '';
+      blocks.forEach(sample => {
+        const btn = document.createElement('button');
+        btn.className = 'pill-btn';
+        btn.innerHTML = `${sample.blockLabel}<small>${sample.bankLabel}</small>`;
+        btn.onclick = () => startBlockQuiz(bank, sample.block);
+        container.appendChild(btn);
+      });
+    }
+
+    function bindSettings(){
+      byId('shuffle-toggle').checked = !!state.settings.shuffleAnswers;
+      byId('shuffle-toggle').addEventListener('change', (e) => {
+        state.settings.shuffleAnswers = e.target.checked;
+        saveState();
+        toast(e.target.checked ? 'Shuffle activado' : 'Shuffle desactivado');
+      });
+    }
+
+    function getQuestionStat(id){
+      if(!state.questionStats[id]) state.questionStats[id] = { correct:0, wrong:0, attempts:0 };
+      return state.questionStats[id];
+    }
+
+    function startRandomFromSelect(){
+      const count = Number(byId('random-count').value);
+      startRandomQuiz(count);
+    }
+
+    function startRandomQuiz(count){
+      const selected = shuffleArray([...QUESTIONS]).slice(0, count);
+      launchQuiz(selected, { type:'random', count, bank:'all', label:`Aleatorio (${count})` });
+    }
+
+    function startBlockQuiz(bank, block){
+      const selected = QUESTIONS.filter(q => q.bank === bank && q.block === block).sort((a,b)=>a.number-b.number);
+      launchQuiz(selected, { type:'block', bank, block, label:`${BANK_LABELS[bank]} · ${selected[0]?.blockLabel || ''}` });
+    }
+
+    function startFailedReview(){
+      const ids = state.failedQuestionIds || [];
+      const selected = QUESTIONS.filter(q => ids.includes(q.id));
+      if(!selected.length){
+        toast('No tienes preguntas pendientes en falladas');
+        showView('failed');
+        return;
+      }
+      launchQuiz(selected, { type:'failed', bank:'failed', label:`Falladas (${selected.length})` });
+    }
+
+    function launchQuiz(questions, config){
+      if(!questions.length){ toast('No hay preguntas disponibles'); return; }
+      currentQuiz = {
+        config,
+        questions,
+        index: 0,
+        results: [],
+        optionOrders: {}
+      };
+      state.lastQuizConfig = config;
+      showView('quiz');
+      renderQuestion();
+    }
+
+    function renderQuestion(){
+      const q = currentQuiz.questions[currentQuiz.index];
+      const total = currentQuiz.questions.length;
+      byId('quiz-bank-badge').textContent = q.bankLabel;
+      byId('quiz-mode-badge').textContent = currentQuiz.config.label;
+      byId('quiz-counter').textContent = `Pregunta ${currentQuiz.index + 1} de ${total}`;
+      byId('quiz-progress').style.width = `${((currentQuiz.index) / total) * 100}%`;
+      byId('quiz-question').textContent = `${q.number}. ${q.text}`;
+      byId('quiz-feedback').style.display = 'none';
+      byId('quiz-feedback').innerHTML = '';
+      byId('quiz-next').style.display = 'none';
+      byId('quiz-finish').style.display = 'none';
+
+      if(!currentQuiz.optionOrders[q.id]){
+        const opts = q.options.map(opt => ({...opt}));
+        currentQuiz.optionOrders[q.id] = state.settings.shuffleAnswers ? shuffleArray(opts) : opts;
+      }
+      const renderOptions = currentQuiz.optionOrders[q.id];
+      const list = byId('quiz-options');
+      list.innerHTML = '';
+      const letters = ['A','B','C','D'];
+      renderOptions.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt';
+        btn.innerHTML = `<span class="letter">${letters[idx]}</span><span>${opt.text}</span>`;
+        btn.onclick = () => answerQuestion(opt.id, btn);
+        list.appendChild(btn);
+      });
+    }
+
+    function answerQuestion(selectedOptionId, clickedButton){
+      const q = currentQuiz.questions[currentQuiz.index];
+      const isCorrect = selectedOptionId === q.correctOptionId;
+      const stat = getQuestionStat(q.id);
+      stat.attempts += 1;
+      if(isCorrect) stat.correct += 1; else stat.wrong += 1;
+
+      const failedSet = new Set(state.failedQuestionIds);
+      if(isCorrect){
+        if(currentQuiz.config.type === 'failed') failedSet.delete(q.id);
+      } else {
+        failedSet.add(q.id);
+      }
+      state.failedQuestionIds = [...failedSet];
+
+      const buttons = [...byId('quiz-options').querySelectorAll('.opt')];
+      const optionOrder = currentQuiz.optionOrders[q.id];
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        const opt = optionOrder[idx];
+        if(opt.id === q.correctOptionId) btn.classList.add('correct');
+        if(opt.id === selectedOptionId && opt.id !== q.correctOptionId) btn.classList.add('wrong');
+      });
+
+      currentQuiz.results.push({
+        questionId: q.id,
+        correct: isCorrect,
+        selectedOptionId,
+        correctOptionId: q.correctOptionId
+      });
+
+      const correctText = q.options.find(o => o.id === q.correctOptionId).text;
+      const fb = byId('quiz-feedback');
+      fb.style.display = 'block';
+      fb.innerHTML = isCorrect
+        ? `<strong style="color:#86efac">Correcta.</strong><br>${correctText}`
+        : `<strong style="color:#fca5a5">Incorrecta.</strong><br><span class="muted">La correcta es:</span> ${correctText}`;
+
+      const isLast = currentQuiz.index === currentQuiz.questions.length - 1;
+      byId('quiz-next').style.display = isLast ? 'none' : 'inline-flex';
+      byId('quiz-finish').style.display = isLast ? 'inline-flex' : 'none';
+      saveState();
+    }
+
+    function nextQuestion(){
+      currentQuiz.index += 1;
+      renderQuestion();
+    }
+
+    function finishQuiz(){
+      const total = currentQuiz.questions.length;
+      const correct = currentQuiz.results.filter(r => r.correct).length;
+      const wrong = total - correct;
+      const pct = total ? Math.round((correct / total) * 100) : 0;
+
+      state.sessions.unshift({
+        at: new Date().toISOString(),
+        label: currentQuiz.config.label,
+        total,
+        correct,
+        wrong,
+        pct
+      });
+      state.sessions = state.sessions.slice(0, 25);
+      saveState();
+
+      byId('result-score').textContent = `${correct}/${total}`;
+      byId('result-pct').textContent = `${pct}%`;
+      byId('result-fails').textContent = `${wrong}`;
+      renderResultsReview();
+      showView('results');
+      syncNow(false);
+    }
+
+    function renderResultsReview(){
+      const wrap = byId('results-review');
+      wrap.innerHTML = '<h3>Revisión</h3>';
+      currentQuiz.questions.forEach((q, idx) => {
+        const res = currentQuiz.results[idx];
+        if(!res) return;
+        const selectedText = q.options.find(o => o.id === res.selectedOptionId)?.text || '-';
+        const correctText = q.options.find(o => o.id === res.correctOptionId)?.text || '-';
+        const item = document.createElement('div');
+        item.className = 'review-item';
+        item.innerHTML = `
+          <h4>${q.number}. ${q.text}</h4>
+          <div class="mini ${res.correct ? 'sync-ok' : 'sync-bad'}"><strong>${res.correct ? 'Correcta' : 'Incorrecta'}</strong></div>
+          <div class="mini muted" style="margin-top:8px"><strong>Tu respuesta:</strong> ${selectedText}</div>
+          <div class="mini muted" style="margin-top:4px"><strong>Correcta:</strong> ${correctText}</div>
+        `;
+        wrap.appendChild(item);
+      });
+    }
+
+    function restartLastQuiz(){
+      if(!state.lastQuizConfig){ toast('No hay una sesión anterior'); return; }
+      const cfg = state.lastQuizConfig;
+      if(cfg.type === 'random') return startRandomQuiz(cfg.count || 20);
+      if(cfg.type === 'block') return startBlockQuiz(cfg.bank, cfg.block);
+      if(cfg.type === 'failed') return startFailedReview();
+    }
+
+    function leaveQuiz(){
+      currentQuiz = null;
+      showView('home');
+    }
+
+    function renderFailedSection(){
+      const failedQuestions = QUESTIONS.filter(q => state.failedQuestionIds.includes(q.id));
+      byId('failed-summary').textContent = failedQuestions.length
+        ? `Tienes ${failedQuestions.length} preguntas pendientes para repasar.`
+        : 'No tienes preguntas pendientes.';
+      const list = byId('failed-list');
+      list.innerHTML = '';
+      if(!failedQuestions.length){
+        list.innerHTML = '<div class="empty">Nada en falladas.</div>';
+        return;
+      }
+      failedQuestions.slice(0, 100).forEach(q => {
+        const item = document.createElement('div');
+        item.className = 'review-item';
+        item.innerHTML = `<h4>${q.id} · ${q.bankLabel} · bloque ${q.blockLabel}</h4><div class="mini muted">${q.number}. ${q.text}</div>`;
+        list.appendChild(item);
+      });
+    }
+
+    function clearFailed(){
+      if(!confirm('Se vaciará el apartado de falladas.')) return;
+      state.failedQuestionIds = [];
+      saveState();
+      toast('Falladas vaciadas');
+      renderFailedSection();
+    }
+
+    function refreshAllUi(){
+      const attempts = Object.values(state.questionStats).reduce((acc, s) => acc + (s.attempts || 0), 0);
+      const correct = Object.values(state.questionStats).reduce((acc, s) => acc + (s.correct || 0), 0);
+      const wrong = Object.values(state.questionStats).reduce((acc, s) => acc + (s.wrong || 0), 0);
+      const accuracy = attempts ? Math.round((correct / attempts) * 100) : 0;
+      byId('stat-answered').textContent = attempts;
+      byId('stat-accuracy').textContent = `${accuracy}%`;
+      byId('stat-failed').textContent = state.failedQuestionIds.length;
+      byId('shuffle-toggle').checked = !!state.settings.shuffleAnswers;
+      renderFailedSection();
+      renderStats();
+    }
+
+    function renderStats(){
+      const attempts = Object.values(state.questionStats).reduce((acc, s) => acc + (s.attempts || 0), 0);
+      const correct = Object.values(state.questionStats).reduce((acc, s) => acc + (s.correct || 0), 0);
+      const wrong = Object.values(state.questionStats).reduce((acc, s) => acc + (s.wrong || 0), 0);
+      byId('stats-total-attempts').textContent = attempts;
+      byId('stats-correct').textContent = correct;
+      byId('stats-wrong').textContent = wrong;
+
+      const bankStats = {
+        common: { total:0, correct:0, wrong:0 },
+        admin: { total:0, correct:0, wrong:0 }
+      };
+      QUESTIONS.forEach(q => {
+        const s = state.questionStats[q.id];
+        if(!s) return;
+        bankStats[q.bank].total += s.attempts || 0;
+        bankStats[q.bank].correct += s.correct || 0;
+        bankStats[q.bank].wrong += s.wrong || 0;
+      });
+      const wrap = byId('bank-stats');
+      wrap.innerHTML = '';
+      ['common','admin'].forEach(bank => {
+        const s = bankStats[bank];
+        const pct = s.total ? Math.round((s.correct / s.total) * 100) : 0;
+        const item = document.createElement('div');
+        item.className = 'review-item';
+        item.innerHTML = `<h4>${BANK_LABELS[bank]}</h4><div class="muted">Intentos: ${s.total} · Aciertos: ${s.correct} · Fallos: ${s.wrong} · ${pct}%</div>`;
+        wrap.appendChild(item);
+      });
+
+      const sessions = byId('session-list');
+      sessions.innerHTML = '';
+      if(!state.sessions.length){
+        sessions.innerHTML = '<div class="empty">Todavía no hay sesiones guardadas.</div>';
+      } else {
+        state.sessions.slice(0,10).forEach(s => {
+          const item = document.createElement('div');
+          item.className = 'review-item';
+          item.innerHTML = `<h4>${s.label}</h4><div class="muted">${new Date(s.at).toLocaleString()} · ${s.correct}/${s.total} · ${s.pct}%</div>`;
+          sessions.appendChild(item);
+        });
+      }
+    }
+
+    function exportState(){
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ope-osakidetza-progreso.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function importState(event){
+      const file = event.target.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const imported = JSON.parse(reader.result);
+          state = deepMerge(structuredClone(DEFAULT_STATE), imported);
+          saveState();
+          toast('Progreso importado');
+        }catch(err){
+          alert('El archivo no es válido');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function initSync(){
+      if(window.APP_CONFIG.SUPABASE_URL && window.APP_CONFIG.SUPABASE_ANON_KEY && window.supabase){
+        supabaseClient = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
+        supabaseClient.auth.getUser().then(({ data }) => {
+          currentUser = data?.user || null;
+          renderSyncStatus();
+          if(currentUser) pullRemoteState();
+        });
+      }
+      renderSyncStatus();
+    }
+
+    async function signUp(){
+      if(!supabaseClient) return toast('Configura app-config.js primero');
+      const email = byId('auth-email').value.trim();
+      const password = byId('auth-password').value.trim();
+      const { error } = await supabaseClient.auth.signUp({ email, password });
+      if(error) return toast(error.message);
+      toast('Cuenta creada. Revisa tu email si tu proyecto exige confirmación.');
+    }
+
+    async function signIn(){
+      if(!supabaseClient) return toast('Configura app-config.js primero');
+      const email = byId('auth-email').value.trim();
+      const password = byId('auth-password').value.trim();
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if(error) return toast(error.message);
+      currentUser = data.user;
+      toast('Sesión iniciada');
+      await pullRemoteState();
+      renderSyncStatus();
+    }
+
+    async function signOut(){
+      if(!supabaseClient) return;
+      await supabaseClient.auth.signOut();
+      currentUser = null;
+      renderSyncStatus();
+      toast('Sesión cerrada');
+    }
+
+    async function pullRemoteState(){
+      if(!supabaseClient || !currentUser) return;
+      const { data, error } = await supabaseClient.from('app_state').select('payload,updated_at').eq('user_id', currentUser.id).maybeSingle();
+      if(error){ toast(error.message); return; }
+      if(data?.payload){
+        state = deepMerge(state, data.payload);
+        saveState();
+      } else {
+        await pushRemoteState();
+      }
+      renderSyncStatus();
+    }
+
+    async function pushRemoteState(){
+      if(!supabaseClient || !currentUser) return false;
+      const payload = JSON.parse(JSON.stringify(state));
+      const { error } = await supabaseClient.from('app_state').upsert({ user_id: currentUser.id, payload, updated_at: new Date().toISOString() });
+      if(error){ toast(error.message); return false; }
+      state.lastSyncedAt = new Date().toISOString();
+      saveState();
+      renderSyncStatus();
+      return true;
+    }
+
+    async function syncNow(showToast = true){
+      if(!supabaseClient || !currentUser){
+        if(showToast) toast('No hay sesión iniciada');
+        return;
+      }
+      const ok = await pushRemoteState();
+      if(ok && showToast) toast('Sincronizado');
+    }
+
+    function renderSyncStatus(){
+      const el = byId('sync-status');
+      if(!supabaseClient){
+        el.innerHTML = '<span class="sync-bad">Sync desactivado.</span> Edita <code>app-config.js</code> con tu URL y tu anon key.';
+        return;
+      }
+      if(!currentUser){
+        el.innerHTML = '<span class="sync-bad">Sin iniciar sesión.</span> Cuando entres, el progreso se compartirá entre dispositivos.';
+        return;
+      }
+      el.innerHTML = `<span class="sync-ok">Conectado como ${currentUser.email}.</span><br><span class="muted">Última sync local: ${state.lastSyncedAt ? new Date(state.lastSyncedAt).toLocaleString() : 'todavía no'}</span>`;
+    }
+
+    function registerServiceWorker(){
+      if('serviceWorker' in navigator){
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(console.error);
+        });
+      }
+    }
+
+    function setupInstallPrompt(){
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        byId('install-btn').style.display = 'inline-flex';
+        byId('install-banner').style.display = 'block';
+      });
+      byId('install-btn').addEventListener('click', installApp);
+      byId('install-banner-btn').addEventListener('click', installApp);
+      window.addEventListener('appinstalled', () => {
+        hideInstallBanner();
+        byId('install-btn').style.display = 'none';
+        toast('App instalada');
+      });
+    }
+
+    async function installApp(){
+      if(!deferredInstallPrompt) return toast('Instalación no disponible todavía');
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      hideInstallBanner();
+    }
+
+    function hideInstallBanner(){ byId('install-banner').style.display = 'none'; }
+
+    function shuffleArray(arr){
+      const clone = [...arr];
+      for(let i = clone.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [clone[i], clone[j]] = [clone[j], clone[i]];
+      }
+      return clone;
+    }
+
+    function toast(msg){
+      const t = byId('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+  </script>
+</body>
+</html>
