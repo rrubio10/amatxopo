@@ -298,8 +298,8 @@
   <div id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./app-config.js"></script>
-  <script src="./questions-data.js"></script>
+  <script src="./app-config.js?v=3"></script>
+  <script src="./questions-data.js?v=3"></script>
   <script>
     window.APP_CONFIG = window.APP_CONFIG || { SUPABASE_URL:'', SUPABASE_ANON_KEY:'' };
 
@@ -338,7 +338,7 @@
       bindSettings();
       initSync();
       refreshAllUi();
-      registerServiceWorker();
+      cleanupOldServiceWorkers();
       setupInstallPrompt();
     }
 
@@ -620,7 +620,6 @@
     function refreshAllUi(){
       const attempts = Object.values(state.questionStats).reduce((acc, s) => acc + (s.attempts || 0), 0);
       const correct = Object.values(state.questionStats).reduce((acc, s) => acc + (s.correct || 0), 0);
-      const wrong = Object.values(state.questionStats).reduce((acc, s) => acc + (s.wrong || 0), 0);
       const accuracy = attempts ? Math.round((correct / attempts) * 100) : 0;
       byId('stat-answered').textContent = attempts;
       byId('stat-accuracy').textContent = `${accuracy}%`;
@@ -703,11 +702,22 @@
 
     function initSync(){
       if(window.APP_CONFIG.SUPABASE_URL && window.APP_CONFIG.SUPABASE_ANON_KEY && window.supabase){
-        supabaseClient = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
-        supabaseClient.auth.getUser().then(({ data }) => {
+        supabaseClient = window.supabase.createClient(
+          window.APP_CONFIG.SUPABASE_URL,
+          window.APP_CONFIG.SUPABASE_ANON_KEY
+        );
+
+        supabaseClient.auth.getUser().then(({ data, error }) => {
+          if(error) console.error(error);
           currentUser = data?.user || null;
           renderSyncStatus();
           if(currentUser) pullRemoteState();
+        });
+
+        supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+          currentUser = session?.user || null;
+          renderSyncStatus();
+          if(currentUser) await pullRemoteState();
         });
       }
       renderSyncStatus();
@@ -715,28 +725,68 @@
 
     async function signUp(){
       if(!supabaseClient) return toast('Configura app-config.js primero');
+
       const email = byId('auth-email').value.trim();
       const password = byId('auth-password').value.trim();
-      const { error } = await supabaseClient.auth.signUp({ email, password });
-      if(error) return toast(error.message);
-      toast('Cuenta creada. Revisa tu email si tu proyecto exige confirmación.');
+
+      if(!email) return toast('Escribe un email');
+      if(!password) return toast('Escribe una contraseña');
+      if(password.length < 6) return toast('La contraseña debe tener al menos 6 caracteres');
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+
+      if(error){
+        console.error(error);
+        return toast(error.message);
+      }
+
+      if (data?.user && data?.session) {
+        currentUser = data.user;
+        await pullRemoteState();
+        renderSyncStatus();
+        return toast('Cuenta creada y sesión iniciada');
+      }
+
+      toast('Cuenta creada. Revisa tu email para confirmar la cuenta.');
     }
 
     async function signIn(){
       if(!supabaseClient) return toast('Configura app-config.js primero');
+
       const email = byId('auth-email').value.trim();
       const password = byId('auth-password').value.trim();
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if(error) return toast(error.message);
+
+      if(!email) return toast('Escribe un email');
+      if(!password) return toast('Escribe una contraseña');
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if(error){
+        console.error(error);
+        return toast(error.message);
+      }
+
       currentUser = data.user;
-      toast('Sesión iniciada');
       await pullRemoteState();
       renderSyncStatus();
+      toast('Sesión iniciada');
     }
 
     async function signOut(){
       if(!supabaseClient) return;
-      await supabaseClient.auth.signOut();
+
+      const { error } = await supabaseClient.auth.signOut();
+      if(error){
+        console.error(error);
+        return toast(error.message);
+      }
+
       currentUser = null;
       renderSyncStatus();
       toast('Sesión cerrada');
@@ -744,8 +794,18 @@
 
     async function pullRemoteState(){
       if(!supabaseClient || !currentUser) return;
-      const { data, error } = await supabaseClient.from('app_state').select('payload,updated_at').eq('user_id', currentUser.id).maybeSingle();
-      if(error){ toast(error.message); return; }
+      const { data, error } = await supabaseClient
+        .from('app_state')
+        .select('payload,updated_at')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+
+      if(error){
+        console.error(error);
+        toast(error.message);
+        return;
+      }
+
       if(data?.payload){
         state = deepMerge(state, data.payload);
         saveState();
@@ -757,9 +817,22 @@
 
     async function pushRemoteState(){
       if(!supabaseClient || !currentUser) return false;
+
       const payload = JSON.parse(JSON.stringify(state));
-      const { error } = await supabaseClient.from('app_state').upsert({ user_id: currentUser.id, payload, updated_at: new Date().toISOString() });
-      if(error){ toast(error.message); return false; }
+      const { error } = await supabaseClient
+        .from('app_state')
+        .upsert({
+          user_id: currentUser.id,
+          payload,
+          updated_at: new Date().toISOString()
+        });
+
+      if(error){
+        console.error(error);
+        toast(error.message);
+        return false;
+      }
+
       state.lastSyncedAt = new Date().toISOString();
       saveState();
       renderSyncStatus();
@@ -778,7 +851,7 @@
     function renderSyncStatus(){
       const el = byId('sync-status');
       if(!supabaseClient){
-        el.innerHTML = '<span class="sync-bad">Sync desactivado.</span> Edita <code>app-config.js</code> con tu URL y tu anon key.';
+        el.innerHTML = '<span class="sync-bad">Sync desactivado.</span> Edita <code>app-config.js</code> con tu URL y tu publishable key.';
         return;
       }
       if(!currentUser){
@@ -788,11 +861,21 @@
       el.innerHTML = `<span class="sync-ok">Conectado como ${currentUser.email}.</span><br><span class="muted">Última sync local: ${state.lastSyncedAt ? new Date(state.lastSyncedAt).toLocaleString() : 'todavía no'}</span>`;
     }
 
-    function registerServiceWorker(){
-      if('serviceWorker' in navigator){
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(console.error);
-        });
+    async function cleanupOldServiceWorkers(){
+      if(!('serviceWorker' in navigator)) return;
+      try{
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for(const reg of regs){
+          await reg.unregister();
+        }
+        if(window.caches){
+          const keys = await caches.keys();
+          for(const key of keys){
+            await caches.delete(key);
+          }
+        }
+      }catch(err){
+        console.error(err);
       }
     }
 
@@ -820,7 +903,9 @@
       hideInstallBanner();
     }
 
-    function hideInstallBanner(){ byId('install-banner').style.display = 'none'; }
+    function hideInstallBanner(){
+      byId('install-banner').style.display = 'none';
+    }
 
     function shuffleArray(arr){
       const clone = [...arr];
