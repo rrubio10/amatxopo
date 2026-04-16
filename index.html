@@ -53,6 +53,8 @@
       --radius:16px;
       --radius-sm:12px;
       --radius-lg:20px;
+
+      --header-height:140px;
     }
     
     *{box-sizing:border-box}
@@ -67,47 +69,49 @@
       line-height:1.6;
     }
     
-    body{padding-bottom:64px}
+    body{padding-top:var(--header-height);padding-bottom:64px}
     
     .wrap{max-width:1100px;margin:0 auto;padding:20px}
     
-    /* HEADER */
+    /* HEADER FIJO */
     header{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:100;
       background:var(--primary-gradient);
       border-bottom:1px solid rgba(255,255,255,.2);
       box-shadow:var(--shadow-lg);
-      position:sticky;
-      top:0;
-      z-index:100;
     }
     
     .hero{
-      padding:32px 20px 28px;
+      padding:16px 20px;
       display:flex;
       flex-wrap:wrap;
-      gap:20px;
+      gap:12px;
       align-items:center;
       justify-content:space-between;
     }
     
     .brand h1{
       margin:0;
-      font-size:clamp(1.6rem,3.5vw,2.4rem);
+      font-size:clamp(1.2rem,3vw,1.8rem);
       color:#ffffff;
       font-weight:800;
       letter-spacing:-0.02em;
     }
     
     .brand p{
-      margin:8px 0 0;
+      margin:4px 0 0;
       color:rgba(255,255,255,0.9);
-      font-size:1rem;
+      font-size:0.85rem;
       font-weight:500;
     }
     
     .top-actions{
       display:flex;
-      gap:12px;
+      gap:10px;
       flex-wrap:wrap;
       align-items:center;
     }
@@ -115,15 +119,15 @@
     .switch{
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:8px;
       background:rgba(255,255,255,.25);
       backdrop-filter:blur(10px);
-      padding:10px 16px;
+      padding:8px 12px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.3);
       color:#ffffff;
       font-weight:600;
-      font-size:0.95rem;
+      font-size:0.85rem;
     }
     
     .switch input{
@@ -132,12 +136,14 @@
       cursor:pointer;
     }
     
-    /* NAVEGACIÓN */
+    /* NAVEGACIÓN FIJA */
     nav{
-      position:sticky;
-      top:0;
+      position:fixed;
+      top:var(--header-height);
+      left:0;
+      right:0;
       z-index:90;
-      background:rgba(255,255,255,.95);
+      background:rgba(255,255,255,.98);
       backdrop-filter:blur(12px);
       border-bottom:2px solid var(--border);
       box-shadow:var(--shadow-sm);
@@ -145,9 +151,9 @@
     
     .nav-row{
       display:flex;
-      gap:8px;
+      gap:6px;
       overflow:auto;
-      padding:14px 20px;
+      padding:10px 20px;
       scrollbar-width:none;
     }
     
@@ -157,11 +163,11 @@
       border:none;
       background:transparent;
       color:var(--text-secondary);
-      padding:12px 18px;
-      border-radius:12px;
+      padding:10px 14px;
+      border-radius:10px;
       cursor:pointer;
       font-weight:700;
-      font-size:0.95rem;
+      font-size:0.85rem;
       white-space:nowrap;
       transition:all 0.2s;
       border:2px solid transparent;
@@ -178,6 +184,11 @@
       border-color:transparent;
       box-shadow:var(--shadow-primary);
     }
+
+    /* Ajuste para el contenido principal */
+    main{
+      margin-top:60px;
+    }
     
     /* GRID */
     .grid{display:grid;gap:20px}
@@ -186,6 +197,10 @@
     
     @media (max-width:860px){
       .grid-2,.grid-3{grid-template-columns:1fr}
+      :root{--header-height:120px}
+      .brand h1{font-size:1.1rem}
+      .brand p{font-size:0.8rem}
+      main{margin-top:50px}
     }
     
     /* CARDS */
@@ -299,6 +314,11 @@
     .btn.warning{
       background:linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
       box-shadow:0 10px 20px -5px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn.secondary{
+      background:linear-gradient(135deg, var(--secondary) 0%, #64748b 100%);
+      box-shadow:0 10px 20px -5px rgba(71, 85, 105, 0.3);
     }
     
     .btn-row{display:flex;flex-wrap:wrap;gap:12px}
@@ -705,7 +725,7 @@
     
     @media (max-width:640px){
       .wrap{padding:16px}
-      .hero{padding:24px 16px 20px}
+      .hero{padding:12px 16px}
       .card{padding:20px}
       .auth-card{padding:28px}
     }
@@ -740,8 +760,8 @@
         <p>PC + Android · bloques de 50 · falladas · sincronización online</p>
       </div>
       <div class="top-actions">
-        <label class="switch"><input type="checkbox" id="shuffle-toggle" /> <span>Shuffle respuestas</span></label>
-        <button class="btn ghost" id="install-btn" style="display:none">📱 Instalar app</button>
+        <label class="switch"><input type="checkbox" id="shuffle-toggle" /> <span>Shuffle</span></label>
+        <button class="btn ghost" id="install-btn" style="display:none;font-size:0.8rem;padding:8px 14px">📱 Instalar</button>
       </div>
     </div>
   </header>
@@ -785,7 +805,7 @@
             <li>Guarda estadísticas y falladas.</li>
             <li>Guarda el test en curso para retomarlo.</li>
             <li>Sincroniza online al contestar, salir y finalizar.</li>
-            <li><strong>Modo simulacro oficial</strong> con contador y puntuación OPE.</li>
+            <li><strong>Modo simulacro oficial</strong> con contador y puntuación solo por aciertos.</li>
             <li>Filtro por banco en modo aleatorio.</li>
           </ul>
         </div>
@@ -833,9 +853,10 @@
           <ul class="mini" style="line-height:1.9;margin:8px 0 0;padding-left:20px">
             <li><strong>100 preguntas</strong> tipo test</li>
             <li><strong>110 minutos</strong> de tiempo límite</li>
-            <li><strong>Puntuación:</strong> Acierto = +1 punto · Error = -0.25 puntos · En blanco = 0 puntos</li>
+            <li><strong>Puntuación:</strong> Acierto = +1 punto · Error y en blanco = 0 puntos</li>
             <li>No se puede ver la solución hasta finalizar</li>
-            <li>Se puede revisar y cambiar respuestas durante el tiempo</li>
+            <li>Puedes navegar hacia adelante y atrás entre preguntas</li>
+            <li>Puedes revisar y cambiar respuestas durante el tiempo</li>
           </ul>
         </div>
 
@@ -950,6 +971,7 @@
         <div id="quiz-options" class="opt-list"></div>
         <div id="quiz-feedback" class="feedback"></div>
         <div class="btn-row" style="margin-top:18px">
+          <button class="btn secondary" id="quiz-prev" style="display:none" onclick="prevQuestion()">← Anterior</button>
           <button class="btn primary" id="quiz-next" style="display:none" onclick="nextQuestion()">Siguiente →</button>
           <button class="btn good" id="quiz-finish" style="display:none" onclick="finishQuiz()">✓ Finalizar</button>
           <button class="btn warning" id="quiz-finish-simulacro" style="display:none" onclick="finishSimulacro()">⏱️ Finalizar Simulacro</button>
@@ -970,7 +992,7 @@
             <h4>⏱️ Resultado Simulacro Oficial</h4>
             <div class="grid grid-3" style="margin-top:14px">
               <div class="stat">
-                <div class="n" id="simulacro-final-score" style="font-size:2rem">0.00</div>
+                <div class="n" id="simulacro-final-score" style="font-size:2rem">0</div>
                 <div class="l">Puntuación final</div>
               </div>
               <div class="stat">
@@ -983,7 +1005,7 @@
               </div>
             </div>
             <div class="mini muted" style="margin-top:14px;line-height:1.8">
-              <strong>Fórmula:</strong> (Aciertos × 1) - (Errores × 0.25) = Puntuación final
+              <strong>Fórmula:</strong> Aciertos × 1 = Puntuación final (sin penalización por errores)
             </div>
           </div>
         </div>
@@ -1012,12 +1034,12 @@
   <div id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./app-config.js?v=21"></script>
-  <script src="./questions-data.js?v=21"></script>
+  <script src="./app-config.js?v=22"></script>
+  <script src="./questions-data.js?v=22"></script>
   <script>
     window.APP_CONFIG = window.APP_CONFIG || { SUPABASE_URL:'', SUPABASE_ANON_KEY:'' };
 
-    const STORAGE_KEY = 'ope_osakidetza_v6';
+    const STORAGE_KEY = 'ope_osakidetza_v7';
     const DEFAULT_STATE = {
       questionStats: {},
       failedQuestionIds: [],
@@ -1040,7 +1062,7 @@
       questions: 100,
       timeMinutes: 110,
       correctPoints: 1,
-      wrongPoints: -0.25,
+      wrongPoints: 0,
       blankPoints: 0
     };
 
@@ -1388,6 +1410,8 @@
       byId('quiz-mode-badge').textContent = currentQuiz.config.label;
       if(isSimulacro){
         byId('quiz-mode-badge').classList.add('warning');
+      } else {
+        byId('quiz-mode-badge').classList.remove('warning');
       }
       
       byId('quiz-counter').textContent = `Pregunta ${currentQuiz.index + 1} de ${total}`;
@@ -1396,6 +1420,7 @@
       byId('quiz-feedback').style.display = 'none';
       byId('quiz-feedback').innerHTML = '';
       byId('quiz-next').style.display = 'none';
+      byId('quiz-prev').style.display = 'none';
       byId('quiz-finish').style.display = 'none';
       byId('quiz-finish-simulacro').style.display = 'none';
 
@@ -1431,8 +1456,11 @@
         renderAnsweredCurrentQuestion(existing);
       } else if(isSimulacro){
         const isLast = currentQuiz.index === currentQuiz.questions.length - 1;
+        const isFirst = currentQuiz.index === 0;
+        
+        byId('quiz-prev').style.display = isFirst ? 'none' : 'inline-flex';
         byId('quiz-next').style.display = isLast ? 'none' : 'inline-flex';
-        byId('quiz-finish-simulacro').style.display = isLast ? 'inline-flex' : 'none';
+        byId('quiz-finish-simulacro').style.display = 'inline-flex';
       }
     }
 
@@ -1505,9 +1533,19 @@
     }
 
     function nextQuestion(){
-      currentQuiz.index += 1;
-      persistCurrentQuiz();
-      renderQuestion();
+      if(currentQuiz.index < currentQuiz.questions.length - 1){
+        currentQuiz.index += 1;
+        persistCurrentQuiz();
+        renderQuestion();
+      }
+    }
+
+    function prevQuestion(){
+      if(currentQuiz.index > 0){
+        currentQuiz.index -= 1;
+        persistCurrentQuiz();
+        renderQuestion();
+      }
     }
 
     async function finishQuiz(){
@@ -1582,9 +1620,7 @@
         });
       });
 
-      const finalScore = (correct * SIMULACRO_CONFIG.correctPoints) + 
-                        (wrong * SIMULACRO_CONFIG.wrongPoints) + 
-                        (blank * SIMULACRO_CONFIG.blankPoints);
+      const finalScore = correct * SIMULACRO_CONFIG.correctPoints;
 
       const pct = total ? Math.round((correct / total) * 100) : 0;
       const elapsed = Math.floor((Date.now() - currentQuiz.config.startTime) / 1000);
@@ -1616,7 +1652,7 @@
       byId('result-pct').textContent = `${pct}%`;
       byId('result-fails').textContent = `${wrong}`;
       
-      byId('simulacro-final-score').textContent = finalScore.toFixed(2);
+      byId('simulacro-final-score').textContent = finalScore;
       byId('simulacro-blanks').textContent = blank;
       byId('simulacro-time-used').textContent = `${timeUsed}m`;
       byId('simulacro-result').style.display = 'block';
@@ -1775,7 +1811,7 @@
         state.sessions.slice(0,10).forEach(s => {
           const item = document.createElement('div');
           item.className = 'review-item';
-          const extra = s.isSimulacro ? ` · Puntuación: ${s.finalScore?.toFixed(2) || 0} · En blanco: ${s.blank || 0}` : '';
+          const extra = s.isSimulacro ? ` · Puntuación: ${s.finalScore || 0} · En blanco: ${s.blank || 0}` : '';
           item.innerHTML = `<h4>${s.isSimulacro ? '⏱️' : '📝'} ${s.label}</h4><div class="muted">${new Date(s.at).toLocaleString()} · ${s.correct}/${s.total} · ${s.pct}%${extra}</div>`;
           sessions.appendChild(item);
         });
@@ -2140,4 +2176,3 @@
   </script>
 </body>
 </html>
-
