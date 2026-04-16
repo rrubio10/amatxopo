@@ -585,6 +585,101 @@
       transform:scale(1.2);
       cursor:pointer;
     }
+
+    /* QUESTION NAVIGATOR */
+    .question-navigator{
+      background:var(--panel);
+      border:2px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      margin-bottom:20px;
+    }
+
+    .question-navigator h4{
+      margin:0 0 12px;
+      font-size:0.95rem;
+      font-weight:700;
+      color:var(--text);
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+    }
+
+    .question-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(40px, 1fr));
+      gap:6px;
+    }
+
+    .question-num{
+      width:40px;
+      height:40px;
+      border:2px solid var(--border);
+      border-radius:8px;
+      background:var(--panel);
+      color:var(--text-secondary);
+      font-weight:700;
+      font-size:0.85rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:all 0.2s;
+    }
+
+    .question-num:hover{
+      border-color:var(--primary);
+      background:var(--primary-soft);
+      transform:scale(1.05);
+    }
+
+    .question-num.answered{
+      background:var(--warning-soft);
+      border-color:var(--warning);
+      color:#b45309;
+    }
+
+    .question-num.current{
+      background:var(--primary-gradient);
+      border-color:var(--primary);
+      color:#ffffff;
+      box-shadow:var(--shadow-primary);
+    }
+
+    .navigator-legend{
+      display:flex;
+      gap:16px;
+      margin-top:12px;
+      flex-wrap:wrap;
+      font-size:0.85rem;
+    }
+
+    .navigator-legend-item{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .navigator-legend-box{
+      width:20px;
+      height:20px;
+      border-radius:4px;
+      border:2px solid;
+    }
+
+    .navigator-legend-box.answered{
+      background:var(--warning-soft);
+      border-color:var(--warning);
+    }
+
+    .navigator-legend-box.blank{
+      background:var(--panel);
+      border-color:var(--border);
+    }
+
+    .navigator-legend-box.current{
+      background:var(--primary-gradient);
+      border-color:var(--primary);
+    }
     
     /* INSTALL BANNER */
     #install-banner{
@@ -708,6 +803,14 @@
       .hero{padding:24px 16px 20px}
       .card{padding:20px}
       .auth-card{padding:28px}
+      .question-grid{
+        grid-template-columns:repeat(auto-fill, minmax(35px, 1fr));
+      }
+      .question-num{
+        width:35px;
+        height:35px;
+        font-size:0.8rem;
+      }
     }
   </style>
 </head>
@@ -836,7 +939,7 @@
             <li><strong>Puntuación:</strong> Acierto = +1 punto · En blanco = 0 puntos</li>
             <li>No se puede ver la solución hasta finalizar</li>
             <li>Se puede revisar y cambiar respuestas durante el tiempo</li>
-            <li>Puedes navegar entre preguntas con los botones anterior/siguiente</li>
+            <li>Puedes navegar entre preguntas con los botones o el mapa visual</li>
           </ul>
         </div>
 
@@ -945,6 +1048,26 @@
           </div>
           <button class="btn ghost" onclick="leaveQuiz()">← Salir</button>
         </div>
+
+        <div id="question-navigator" class="question-navigator" style="display:none">
+          <h4>📍 Mapa de preguntas</h4>
+          <div class="question-grid" id="question-grid"></div>
+          <div class="navigator-legend">
+            <div class="navigator-legend-item">
+              <div class="navigator-legend-box current"></div>
+              <span>Actual</span>
+            </div>
+            <div class="navigator-legend-item">
+              <div class="navigator-legend-box answered"></div>
+              <span>Respondida</span>
+            </div>
+            <div class="navigator-legend-item">
+              <div class="navigator-legend-box blank"></div>
+              <span>Sin responder</span>
+            </div>
+          </div>
+        </div>
+
         <div class="progress"><div id="quiz-progress"></div></div>
         <div class="muted mini" id="quiz-counter">Pregunta 1 de 10</div>
         <h3 id="quiz-question" class="q-title"></h3>
@@ -1247,6 +1370,7 @@
       state.lastQuizConfig = config;
       persistCurrentQuiz();
       showView('quiz');
+      renderQuestionNavigator();
       renderQuestion();
 
       if(config.type === 'simulacro'){
@@ -1334,6 +1458,7 @@
       
       currentQuizSnapshot = null;
       showView('quiz');
+      renderQuestionNavigator();
       renderQuestion();
 
       if(currentQuiz.config.type === 'simulacro'){
@@ -1379,6 +1504,42 @@
       await syncNow(false);
       toast('🗑️ Test en curso descartado');
       showView('home');
+    }
+
+    function renderQuestionNavigator(){
+      const navigatorEl = byId('question-navigator');
+      const isSimulacro = currentQuiz?.config?.type === 'simulacro';
+      
+      if(!isSimulacro){
+        navigatorEl.style.display = 'none';
+        return;
+      }
+
+      navigatorEl.style.display = 'block';
+      const grid = byId('question-grid');
+      grid.innerHTML = '';
+
+      currentQuiz.questions.forEach((q, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'question-num';
+        btn.textContent = idx + 1;
+        
+        const hasAnswer = currentQuiz.userAnswers[q.id];
+        if(hasAnswer) btn.classList.add('answered');
+        if(idx === currentQuiz.index) btn.classList.add('current');
+        
+        btn.onclick = () => goToQuestion(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function goToQuestion(index){
+      if(!currentQuiz) return;
+      currentQuiz.index = index;
+      persistCurrentQuiz();
+      renderQuestionNavigator();
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function renderQuestion(){
@@ -1439,6 +1600,10 @@
         byId('quiz-prev').style.display = isFirst ? 'none' : 'inline-flex';
         byId('quiz-next').style.display = isLast ? 'none' : 'inline-flex';
         byId('quiz-finish-simulacro').style.display = isLast ? 'inline-flex' : 'none';
+      }
+
+      if(isSimulacro){
+        renderQuestionNavigator();
       }
     }
 
