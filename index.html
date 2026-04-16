@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OPE Osakidetza Test</title>
   <meta name="theme-color" content="#b91c1c" />
-  <meta name="description" content="App de test para OPE Osakidetza con práctica por bloques, falladas y sincronización opcional." />
+  <meta name="description" content="App de test para OPE Osakidetza con práctica por bloques, falladas y sincronización." />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <style>
     :root{
@@ -19,7 +19,6 @@
       --text:#edf2f7;
       --muted:#9fb0cc;
       --accent:#dc2626;
-      --accent-2:#ef4444;
       --good:#16a34a;
       --bad:#dc2626;
       --warn:#f59e0b;
@@ -29,13 +28,8 @@
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:linear-gradient(180deg,#08101d 0%,#0b1220 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100%}
     body{padding-bottom:64px}
-    a{color:inherit}
     .wrap{max-width:980px;margin:0 auto;padding:16px}
-    header{
-      background:linear-gradient(135deg,#991b1b,#7f1d1d 60%,#111827);
-      border-bottom:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow);
-    }
+    header{background:linear-gradient(135deg,#991b1b,#7f1d1d 60%,#111827);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow)}
     .hero{padding:28px 16px 22px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
     .brand h1{margin:0;font-size:clamp(1.5rem,3.2vw,2.2rem)}
     .brand p{margin:6px 0 0;color:#fecaca;font-size:.95rem}
@@ -61,7 +55,6 @@
     .btn.primary{background:var(--accent)}
     .btn.good{background:var(--good)}
     .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
-    .btn.warn{background:var(--warn);color:#111827}
     .btn-row{display:flex;flex-wrap:wrap;gap:10px}
     .pill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
     .pill-btn{padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-weight:800;text-align:left;cursor:pointer}
@@ -103,7 +96,7 @@
     <div class="wrap hero">
       <div class="brand">
         <h1>OPE Osakidetza Test</h1>
-        <p>PC + Android · bloques de 50 · falladas · shuffle de respuestas</p>
+        <p>PC + Android · bloques de 50 · falladas · usuario + contraseña</p>
       </div>
       <div class="top-actions">
         <label class="switch"><input type="checkbox" id="shuffle-toggle" /> <span>Shuffle respuestas</span></label>
@@ -131,6 +124,7 @@
         <div class="stat"><div class="n" id="stat-accuracy">0%</div><div class="l">Acierto global</div></div>
         <div class="stat"><div class="n" id="stat-failed">0</div><div class="l">Pendientes en falladas</div></div>
       </div>
+
       <div class="grid grid-2" style="margin-top:16px">
         <div class="card">
           <h2>Empezar rápido</h2>
@@ -139,8 +133,10 @@
             <button class="btn" onclick="startRandomQuiz(50)">50 aleatorias</button>
             <button class="btn ghost" onclick="startFailedReview()">Repasar falladas</button>
           </div>
-          <p class="footer-note">El modo shuffle cambia el orden visual de las respuestas en cada pregunta sin romper la correcta.</p>
+          <div id="resume-box" style="margin-top:14px"></div>
+          <p class="footer-note">Se guarda el progreso local y, si has iniciado sesión, también se sincroniza al contestar cada pregunta.</p>
         </div>
+
         <div class="card">
           <h2>Qué hace esta versión</h2>
           <ul class="muted mini" style="line-height:1.8; padding-left:18px; margin:0">
@@ -148,7 +144,8 @@
             <li>Temario Específico en bloques de 50.</li>
             <li>Común C2, C3, D y E en bloques de 50.</li>
             <li>Almacén de falladas con repaso.</li>
-            <li>Sincronización opcional con Supabase.</li>
+            <li>Usuario + contraseña.</li>
+            <li>Sincronización automática con Supabase.</li>
           </ul>
         </div>
       </div>
@@ -157,7 +154,7 @@
     <section id="random" class="section">
       <div class="card">
         <h2>Todo aleatorio</h2>
-        <p class="muted">Mezcla las 500 preguntas y lanza una sesión nueva.</p>
+        <p class="muted">Mezcla toda la batería y lanza una sesión nueva.</p>
         <div class="form-grid" style="margin-top:14px">
           <select id="random-count" class="select">
             <option value="10">10 preguntas</option>
@@ -224,10 +221,10 @@
       <div class="grid grid-2">
         <div class="card">
           <h2>Sincronización</h2>
-          <p class="muted">La app funciona sin cuenta. Si configuras Supabase, podrás iniciar sesión y compartir progreso entre PC y Android.</p>
+          <p class="muted">Usa usuario + contraseña. Por dentro se convierte en una cuenta interna para Supabase.</p>
           <div id="sync-status" class="mini" style="margin:12px 0"></div>
           <div class="form-grid">
-            <input id="auth-email" class="input" placeholder="Email" type="email" />
+            <input id="auth-user" class="input" placeholder="Usuario" type="text" />
             <input id="auth-password" class="input" placeholder="Contraseña" type="password" />
           </div>
           <div class="btn-row" style="margin-top:12px">
@@ -237,13 +234,17 @@
             <button class="btn ghost" onclick="signOut()">Salir</button>
           </div>
         </div>
+
         <div class="card">
           <h2>Copias locales</h2>
           <div class="btn-row">
             <button class="btn ghost" onclick="exportState()">Exportar progreso</button>
-            <label class="btn ghost" style="display:inline-flex;align-items:center;cursor:pointer">Importar progreso<input type="file" accept="application/json" hidden onchange="importState(event)"></label>
+            <label class="btn ghost" style="display:inline-flex;align-items:center;cursor:pointer">
+              Importar progreso
+              <input type="file" accept="application/json" hidden onchange="importState(event)">
+            </label>
           </div>
-          <p class="footer-note">Aunque no configures sync, siempre tendrás guardado local y copia exportable.</p>
+          <p class="footer-note">Aunque no uses sync, siempre tendrás guardado local y copia exportable.</p>
         </div>
       </div>
     </section>
@@ -298,22 +299,24 @@
       </div>
     </div>
   </div>
+
   <div id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./app-config.js?v=9"></script>
-  <script src="./questions-data.js?v=9"></script>
+  <script src="./app-config.js?v=12"></script>
+  <script src="./questions-data.js?v=12"></script>
   <script>
     window.APP_CONFIG = window.APP_CONFIG || { SUPABASE_URL:'', SUPABASE_ANON_KEY:'' };
 
-    const STORAGE_KEY = 'ope_osakidetza_v3';
+    const STORAGE_KEY = 'ope_osakidetza_v4';
     const DEFAULT_STATE = {
       questionStats: {},
       failedQuestionIds: [],
       sessions: [],
       settings: { shuffleAnswers: false },
       lastQuizConfig: null,
-      lastSyncedAt: null
+      lastSyncedAt: null,
+      inProgressQuiz: null
     };
 
     const BANK_LABELS = {
@@ -343,6 +346,7 @@
       refreshAllUi();
       cleanupOldServiceWorkers();
       setupInstallPrompt();
+      renderResumeBox();
     }
 
     function loadState(){
@@ -359,6 +363,7 @@
     function saveState(){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       refreshAllUi();
+      renderResumeBox();
     }
 
     function deepMerge(base, extra){
@@ -407,6 +412,7 @@
       byId('shuffle-toggle').addEventListener('change', (e) => {
         state.settings.shuffleAnswers = e.target.checked;
         saveState();
+        syncNow(false);
         toast(e.target.checked ? 'Shuffle activado' : 'Shuffle desactivado');
       });
     }
@@ -452,8 +458,91 @@
         optionOrders: {}
       };
       state.lastQuizConfig = config;
+      persistCurrentQuiz();
       showView('quiz');
       renderQuestion();
+    }
+
+    function persistCurrentQuiz(){
+      if(!currentQuiz){
+        state.inProgressQuiz = null;
+        saveState();
+        return;
+      }
+
+      state.inProgressQuiz = {
+        config: currentQuiz.config,
+        questionIds: currentQuiz.questions.map(q => q.id),
+        index: currentQuiz.index,
+        results: currentQuiz.results,
+        optionOrders: currentQuiz.optionOrders
+      };
+      saveState();
+    }
+
+    function restoreQuizFromState(){
+      const saved = state.inProgressQuiz;
+      if(!saved || !saved.questionIds?.length){
+        toast('No hay test en curso');
+        return;
+      }
+
+      const questions = saved.questionIds
+        .map(id => QUESTIONS.find(q => q.id === id))
+        .filter(Boolean);
+
+      if(!questions.length){
+        toast('No se pudo recuperar el test');
+        return;
+      }
+
+      currentQuiz = {
+        config: saved.config,
+        questions,
+        index: saved.index || 0,
+        results: Array.isArray(saved.results) ? saved.results : [],
+        optionOrders: saved.optionOrders || {}
+      };
+
+      showView('quiz');
+      renderQuestion();
+
+      const currentQ = currentQuiz.questions[currentQuiz.index];
+      const existing = currentQuiz.results.find(r => r.questionId === currentQ?.id);
+      if(existing){
+        renderAnsweredCurrentQuestion(existing);
+      }
+    }
+
+    function renderResumeBox(){
+      const box = byId('resume-box');
+      const saved = state.inProgressQuiz;
+      if(!saved || !saved.questionIds?.length){
+        box.innerHTML = '';
+        return;
+      }
+
+      const total = saved.questionIds.length;
+      const currentPos = (saved.index || 0) + 1;
+      box.innerHTML = `
+        <div class="review-item">
+          <h4>Test en curso</h4>
+          <div class="muted mini">${saved.config?.label || 'Sesión'} · pregunta ${currentPos} de ${total}</div>
+          <div class="btn-row" style="margin-top:10px">
+            <button class="btn primary" onclick="restoreQuizFromState()">Continuar</button>
+            <button class="btn ghost" onclick="discardCurrentQuiz()">Descartar</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function discardCurrentQuiz(){
+      currentQuiz = null;
+      state.inProgressQuiz = null;
+      saveState();
+      syncNow(false);
+      toast('Test en curso descartado');
+      showView('home');
     }
 
     function renderQuestion(){
@@ -473,21 +562,60 @@
         const opts = q.options.map(opt => ({...opt}));
         currentQuiz.optionOrders[q.id] = state.settings.shuffleAnswers ? shuffleArray(opts) : opts;
       }
+
       const renderOptions = currentQuiz.optionOrders[q.id];
       const list = byId('quiz-options');
       list.innerHTML = '';
       const letters = ['A','B','C','D'];
+
       renderOptions.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'opt';
         btn.innerHTML = `<span class="letter">${letters[idx]}</span><span>${opt.text}</span>`;
-        btn.onclick = () => answerQuestion(opt.id, btn);
+        btn.onclick = () => answerQuestion(opt.id);
         list.appendChild(btn);
       });
+
+      persistCurrentQuiz();
+
+      const existing = currentQuiz.results.find(r => r.questionId === q.id);
+      if(existing){
+        renderAnsweredCurrentQuestion(existing);
+      }
     }
 
-    function answerQuestion(selectedOptionId, clickedButton){
+    function renderAnsweredCurrentQuestion(result){
       const q = currentQuiz.questions[currentQuiz.index];
+      const buttons = [...byId('quiz-options').querySelectorAll('.opt')];
+      const optionOrder = currentQuiz.optionOrders[q.id] || [];
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        const opt = optionOrder[idx];
+        if(!opt) return;
+        if(opt.id === q.correctOptionId) btn.classList.add('correct');
+        if(opt.id === result.selectedOptionId && opt.id !== q.correctOptionId) btn.classList.add('wrong');
+      });
+
+      const correctText = q.options.find(o => o.id === q.correctOptionId)?.text || '';
+      const fb = byId('quiz-feedback');
+      fb.style.display = 'block';
+      fb.innerHTML = result.correct
+        ? `<strong style="color:#86efac">Correcta.</strong><br>${correctText}`
+        : `<strong style="color:#fca5a5">Incorrecta.</strong><br><span class="muted">La correcta es:</span> ${correctText}`;
+
+      const isLast = currentQuiz.index === currentQuiz.questions.length - 1;
+      byId('quiz-next').style.display = isLast ? 'none' : 'inline-flex';
+      byId('quiz-finish').style.display = isLast ? 'inline-flex' : 'none';
+    }
+
+    function answerQuestion(selectedOptionId){
+      const q = currentQuiz.questions[currentQuiz.index];
+      const alreadyAnswered = currentQuiz.results.find(r => r.questionId === q.id);
+      if(alreadyAnswered){
+        renderAnsweredCurrentQuestion(alreadyAnswered);
+        return;
+      }
+
       const isCorrect = selectedOptionId === q.correctOptionId;
       const stat = getQuestionStat(q.id);
       stat.attempts += 1;
@@ -501,37 +629,22 @@
       }
       state.failedQuestionIds = [...failedSet];
 
-      const buttons = [...byId('quiz-options').querySelectorAll('.opt')];
-      const optionOrder = currentQuiz.optionOrders[q.id];
-      buttons.forEach((btn, idx) => {
-        btn.disabled = true;
-        const opt = optionOrder[idx];
-        if(opt.id === q.correctOptionId) btn.classList.add('correct');
-        if(opt.id === selectedOptionId && opt.id !== q.correctOptionId) btn.classList.add('wrong');
-      });
-
-      currentQuiz.results.push({
+      const result = {
         questionId: q.id,
         correct: isCorrect,
         selectedOptionId,
         correctOptionId: q.correctOptionId
-      });
+      };
 
-      const correctText = q.options.find(o => o.id === q.correctOptionId).text;
-      const fb = byId('quiz-feedback');
-      fb.style.display = 'block';
-      fb.innerHTML = isCorrect
-        ? `<strong style="color:#86efac">Correcta.</strong><br>${correctText}`
-        : `<strong style="color:#fca5a5">Incorrecta.</strong><br><span class="muted">La correcta es:</span> ${correctText}`;
-
-      const isLast = currentQuiz.index === currentQuiz.questions.length - 1;
-      byId('quiz-next').style.display = isLast ? 'none' : 'inline-flex';
-      byId('quiz-finish').style.display = isLast ? 'inline-flex' : 'none';
-      saveState();
+      currentQuiz.results.push(result);
+      renderAnsweredCurrentQuestion(result);
+      persistCurrentQuiz();
+      syncNow(false);
     }
 
     function nextQuestion(){
       currentQuiz.index += 1;
+      persistCurrentQuiz();
       renderQuestion();
     }
 
@@ -550,6 +663,7 @@
         pct
       });
       state.sessions = state.sessions.slice(0, 25);
+      state.inProgressQuiz = null;
       saveState();
 
       byId('result-score').textContent = `${correct}/${total}`;
@@ -558,13 +672,18 @@
       renderResultsReview();
       showView('results');
       syncNow(false);
+      currentQuiz = null;
     }
 
     function renderResultsReview(){
       const wrap = byId('results-review');
       wrap.innerHTML = '<h3>Revisión</h3>';
-      currentQuiz.questions.forEach((q, idx) => {
-        const res = currentQuiz.results[idx];
+
+      const quizRef = state.lastQuizConfig ? (currentQuiz || buildLastQuizFromState()) : null;
+      const sourceQuestions = quizRef?.questions || [];
+
+      sourceQuestions.forEach((q, idx) => {
+        const res = quizRef.results[idx];
         if(!res) return;
         const selectedText = q.options.find(o => o.id === res.selectedOptionId)?.text || '-';
         const correctText = q.options.find(o => o.id === res.correctOptionId)?.text || '-';
@@ -580,6 +699,10 @@
       });
     }
 
+    function buildLastQuizFromState(){
+      return null;
+    }
+
     function restartLastQuiz(){
       if(!state.lastQuizConfig){ toast('No hay una sesión anterior'); return; }
       const cfg = state.lastQuizConfig;
@@ -589,8 +712,11 @@
     }
 
     function leaveQuiz(){
+      persistCurrentQuiz();
+      syncNow(false);
       currentQuiz = null;
       showView('home');
+      toast('Test guardado para continuar después');
     }
 
     function renderFailedSection(){
@@ -616,6 +742,7 @@
       if(!confirm('Se vaciará el apartado de falladas.')) return;
       state.failedQuestionIds = [];
       saveState();
+      syncNow(false);
       toast('Falladas vaciadas');
       renderFailedSection();
     }
@@ -623,6 +750,7 @@
     function refreshAllUi(){
       const attempts = Object.values(state.questionStats).reduce((acc, s) => acc + (s.attempts || 0), 0);
       const correct = Object.values(state.questionStats).reduce((acc, s) => acc + (s.correct || 0), 0);
+      const wrong = Object.values(state.questionStats).reduce((acc, s) => acc + (s.wrong || 0), 0);
       const accuracy = attempts ? Math.round((correct / attempts) * 100) : 0;
       byId('stat-answered').textContent = attempts;
       byId('stat-accuracy').textContent = `${accuracy}%`;
@@ -644,6 +772,7 @@
         common: { total:0, correct:0, wrong:0 },
         admin: { total:0, correct:0, wrong:0 }
       };
+
       QUESTIONS.forEach(q => {
         const s = state.questionStats[q.id];
         if(!s) return;
@@ -651,6 +780,7 @@
         bankStats[q.bank].correct += s.correct || 0;
         bankStats[q.bank].wrong += s.wrong || 0;
       });
+
       const wrap = byId('bank-stats');
       wrap.innerHTML = '';
       ['common','admin'].forEach(bank => {
@@ -694,6 +824,7 @@
           const imported = JSON.parse(reader.result);
           state = deepMerge(structuredClone(DEFAULT_STATE), imported);
           saveState();
+          syncNow(false);
           toast('Progreso importado');
         }catch(err){
           alert('El archivo no es válido');
@@ -703,18 +834,33 @@
       event.target.value = '';
     }
 
+    function usernameToEmail(username){
+      const clean = String(username || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/[^a-z0-9._-]/g, '');
+      return `${clean}@amatxopo.local`;
+    }
+
     function initSync(){
       if(window.APP_CONFIG.SUPABASE_URL && window.APP_CONFIG.SUPABASE_ANON_KEY && window.supabase){
         supabaseClient = window.supabase.createClient(
           window.APP_CONFIG.SUPABASE_URL,
-          window.APP_CONFIG.SUPABASE_ANON_KEY
+          window.APP_CONFIG.SUPABASE_ANON_KEY,
+          {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true
+            }
+          }
         );
 
-        supabaseClient.auth.getUser().then(({ data, error }) => {
+        supabaseClient.auth.getUser().then(async ({ data, error }) => {
           if(error) console.error(error);
           currentUser = data?.user || null;
           renderSyncStatus();
-          if(currentUser) pullRemoteState();
+          if(currentUser) await pullRemoteState();
         });
 
         supabaseClient.auth.onAuthStateChange(async (_event, session) => {
@@ -729,16 +875,18 @@
     async function signUp(){
       if(!supabaseClient) return toast('Configura app-config.js primero');
 
-      const email = byId('auth-email').value.trim();
+      const username = byId('auth-user').value.trim();
       const password = byId('auth-password').value.trim();
 
-      if(!email) return toast('Escribe un email');
+      if(!username) return toast('Escribe un usuario');
       if(!password) return toast('Escribe una contraseña');
-      if(password.length < 6) return toast('La contraseña debe tener al menos 6 caracteres');
+
+      const email = usernameToEmail(username);
 
       const { data, error } = await supabaseClient.auth.signUp({
         email,
-        password
+        password,
+        options: { data: { username } }
       });
 
       if(error){
@@ -753,17 +901,19 @@
         return toast('Cuenta creada y sesión iniciada');
       }
 
-      toast('Cuenta creada. Revisa tu email para confirmar la cuenta.');
+      toast('Cuenta creada');
     }
 
     async function signIn(){
       if(!supabaseClient) return toast('Configura app-config.js primero');
 
-      const email = byId('auth-email').value.trim();
+      const username = byId('auth-user').value.trim();
       const password = byId('auth-password').value.trim();
 
-      if(!email) return toast('Escribe un email');
+      if(!username) return toast('Escribe un usuario');
       if(!password) return toast('Escribe una contraseña');
+
+      const email = usernameToEmail(username);
 
       const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
@@ -797,6 +947,7 @@
 
     async function pullRemoteState(){
       if(!supabaseClient || !currentUser) return;
+
       const { data, error } = await supabaseClient
         .from('app_state')
         .select('payload,updated_at')
@@ -810,7 +961,7 @@
       }
 
       if(data?.payload){
-        state = deepMerge(state, data.payload);
+        state = deepMerge(structuredClone(DEFAULT_STATE), data.payload);
         saveState();
       } else {
         await pushRemoteState();
@@ -861,7 +1012,8 @@
         el.innerHTML = '<span class="sync-bad">Sin iniciar sesión.</span> Cuando entres, el progreso se compartirá entre dispositivos.';
         return;
       }
-      el.innerHTML = `<span class="sync-ok">Conectado como ${currentUser.email}.</span><br><span class="muted">Última sync local: ${state.lastSyncedAt ? new Date(state.lastSyncedAt).toLocaleString() : 'todavía no'}</span>`;
+      const username = currentUser.user_metadata?.username || currentUser.email || 'usuario';
+      el.innerHTML = `<span class="sync-ok">Conectado como ${username}.</span><br><span class="muted">Última sync local: ${state.lastSyncedAt ? new Date(state.lastSyncedAt).toLocaleString() : 'todavía no'}</span>`;
     }
 
     async function cleanupOldServiceWorkers(){
@@ -926,6 +1078,19 @@
       clearTimeout(toast._timer);
       toast._timer = setTimeout(() => t.classList.remove('show'), 2200);
     }
+
+    window.addEventListener('beforeunload', () => {
+      try{
+        if(currentQuiz){
+          persistCurrentQuiz();
+        }
+        if(currentUser){
+          pushRemoteState();
+        }
+      }catch(e){
+        console.error(e);
+      }
+    });
   </script>
 </body>
 </html>
