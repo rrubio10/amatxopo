@@ -295,6 +295,11 @@
       color:var(--primary);
       box-shadow:var(--shadow);
     }
+
+    .btn.warning{
+      background:linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+      box-shadow:0 10px 20px -5px rgba(245, 158, 11, 0.3);
+    }
     
     .btn-row{display:flex;flex-wrap:wrap;gap:12px}
     
@@ -373,6 +378,12 @@
       font-weight:800;
       text-transform:uppercase;
       letter-spacing:0.05em;
+    }
+
+    .badge.warning{
+      background:var(--warning-soft);
+      border-color:var(--warning);
+      color:#b45309;
     }
     
     /* PROGRESS BAR */
@@ -517,6 +528,62 @@
       line-height:1.7;
       padding-top:14px;
       border-top:1px solid var(--border);
+    }
+
+    /* TIMER */
+    .timer{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 16px;
+      background:var(--warning-soft);
+      border:2px solid var(--warning);
+      border-radius:999px;
+      font-weight:800;
+      font-size:1.1rem;
+      color:#b45309;
+    }
+
+    .timer.expired{
+      background:var(--error-soft);
+      border-color:var(--error);
+      color:var(--error);
+      animation:pulse 1s infinite;
+    }
+
+    @keyframes pulse{
+      0%, 100%{opacity:1}
+      50%{opacity:0.6}
+    }
+
+    /* CHECKBOX GROUP */
+    .checkbox-group{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin:14px 0;
+    }
+
+    .checkbox-group label{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px;
+      border:2px solid var(--border);
+      border-radius:var(--radius-sm);
+      cursor:pointer;
+      transition:all 0.2s;
+    }
+
+    .checkbox-group label:hover{
+      border-color:var(--primary);
+      background:var(--primary-soft);
+    }
+
+    .checkbox-group input[type="checkbox"]{
+      accent-color:var(--primary);
+      transform:scale(1.2);
+      cursor:pointer;
     }
     
     /* INSTALL BANNER */
@@ -683,6 +750,7 @@
     <div class="wrap nav-row">
       <button class="tab active" data-view="home">🏠 Inicio</button>
       <button class="tab" data-view="random">🎲 Aleatorio</button>
+      <button class="tab" data-view="simulacro">⏱️ Simulacro</button>
       <button class="tab" data-view="specific">📚 Específico</button>
       <button class="tab" data-view="common">📖 Común</button>
       <button class="tab" data-view="failed">❌ Falladas</button>
@@ -717,7 +785,8 @@
             <li>Guarda estadísticas y falladas.</li>
             <li>Guarda el test en curso para retomarlo.</li>
             <li>Sincroniza online al contestar, salir y finalizar.</li>
-            <li>Usuario + contraseña en pantalla completa antes de entrar.</li>
+            <li><strong>Modo simulacro oficial</strong> con contador y puntuación OPE.</li>
+            <li>Filtro por banco en modo aleatorio.</li>
           </ul>
         </div>
       </div>
@@ -725,17 +794,67 @@
 
     <section id="random" class="section">
       <div class="card">
-        <h2>🎲 Todo aleatorio</h2>
-        <p class="muted">Mezcla toda la batería y lanza una sesión nueva.</p>
+        <h2>🎲 Modo Aleatorio</h2>
+        <p class="muted">Mezcla preguntas y lanza una sesión personalizada.</p>
+        
+        <div style="margin-top:16px">
+          <label style="display:block;font-weight:700;margin-bottom:8px">Origen de las preguntas:</label>
+          <div class="checkbox-group">
+            <label>
+              <input type="checkbox" id="random-bank-admin" checked />
+              <span>📚 Temario Específico</span>
+            </label>
+            <label>
+              <input type="checkbox" id="random-bank-common" checked />
+              <span>📖 Común (C2, C3, D, E)</span>
+            </label>
+          </div>
+        </div>
+
         <div class="form-grid" style="margin-top:16px">
           <select id="random-count" class="select">
             <option value="10">10 preguntas</option>
             <option value="20" selected>20 preguntas</option>
             <option value="50">50 preguntas</option>
             <option value="100">100 preguntas</option>
-            <option value="500">Todas las preguntas</option>
           </select>
           <button class="btn primary" onclick="startRandomFromSelect()">Empezar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="simulacro" class="section">
+      <div class="card">
+        <h2>⏱️ Modo Simulacro Oficial</h2>
+        <p class="muted">Simula las condiciones reales del examen OPE con tiempo límite y puntuación oficial.</p>
+        
+        <div class="review-item" style="background:var(--warning-soft);border-color:var(--warning)">
+          <h4>📋 Reglas del simulacro:</h4>
+          <ul class="mini" style="line-height:1.9;margin:8px 0 0;padding-left:20px">
+            <li><strong>100 preguntas</strong> tipo test</li>
+            <li><strong>110 minutos</strong> de tiempo límite</li>
+            <li><strong>Puntuación:</strong> Acierto = +1 punto · Error = -0.25 puntos · En blanco = 0 puntos</li>
+            <li>No se puede ver la solución hasta finalizar</li>
+            <li>Se puede revisar y cambiar respuestas durante el tiempo</li>
+          </ul>
+        </div>
+
+        <div style="margin-top:16px">
+          <label style="display:block;font-weight:700;margin-bottom:8px">Origen de las preguntas:</label>
+          <div class="checkbox-group">
+            <label>
+              <input type="checkbox" id="simulacro-bank-admin" checked />
+              <span>📚 Temario Específico</span>
+            </label>
+            <label>
+              <input type="checkbox" id="simulacro-bank-common" checked />
+              <span>📖 Común (C2, C3, D, E)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-top:20px">
+          <button class="btn warning" onclick="startSimulacro()">⏱️ Iniciar Simulacro Oficial</button>
         </div>
       </div>
     </section>
@@ -817,10 +936,11 @@
 
     <section id="quiz" class="section">
       <div class="card">
-        <div class="btn-row" style="justify-content:space-between;align-items:center">
+        <div class="btn-row" style="justify-content:space-between;align-items:center;flex-wrap:wrap">
           <div class="kicker">
             <span class="badge" id="quiz-bank-badge">Banco</span>
             <span class="badge" id="quiz-mode-badge">Modo</span>
+            <span class="timer" id="quiz-timer" style="display:none">⏱️ <span id="timer-display">00:00</span></span>
           </div>
           <button class="btn ghost" onclick="leaveQuiz()">← Salir</button>
         </div>
@@ -832,6 +952,7 @@
         <div class="btn-row" style="margin-top:18px">
           <button class="btn primary" id="quiz-next" style="display:none" onclick="nextQuestion()">Siguiente →</button>
           <button class="btn good" id="quiz-finish" style="display:none" onclick="finishQuiz()">✓ Finalizar</button>
+          <button class="btn warning" id="quiz-finish-simulacro" style="display:none" onclick="finishSimulacro()">⏱️ Finalizar Simulacro</button>
         </div>
       </div>
     </section>
@@ -843,6 +964,28 @@
           <div class="stat"><div class="n" id="result-score">0/0</div><div class="l">Aciertos</div></div>
           <div class="stat"><div class="n" id="result-pct">0%</div><div class="l">Porcentaje</div></div>
           <div class="stat"><div class="n" id="result-fails">0</div><div class="l">Errores</div></div>
+        </div>
+        <div id="simulacro-result" style="display:none;margin-top:20px">
+          <div class="review-item" style="background:var(--warning-soft);border-color:var(--warning)">
+            <h4>⏱️ Resultado Simulacro Oficial</h4>
+            <div class="grid grid-3" style="margin-top:14px">
+              <div class="stat">
+                <div class="n" id="simulacro-final-score" style="font-size:2rem">0.00</div>
+                <div class="l">Puntuación final</div>
+              </div>
+              <div class="stat">
+                <div class="n" id="simulacro-blanks">0</div>
+                <div class="l">En blanco</div>
+              </div>
+              <div class="stat">
+                <div class="n" id="simulacro-time-used">0m</div>
+                <div class="l">Tiempo usado</div>
+              </div>
+            </div>
+            <div class="mini muted" style="margin-top:14px;line-height:1.8">
+              <strong>Fórmula:</strong> (Aciertos × 1) - (Errores × 0.25) = Puntuación final
+            </div>
+          </div>
         </div>
         <div class="btn-row" style="margin-top:18px">
           <button class="btn primary" onclick="showView('home')">🏠 Ir a inicio</button>
@@ -869,17 +1012,17 @@
   <div id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./app-config.js?v=20"></script>
-  <script src="./questions-data.js?v=20"></script>
+  <script src="./app-config.js?v=21"></script>
+  <script src="./questions-data.js?v=21"></script>
   <script>
     window.APP_CONFIG = window.APP_CONFIG || { SUPABASE_URL:'', SUPABASE_ANON_KEY:'' };
 
-    const STORAGE_KEY = 'ope_osakidetza_v5';
+    const STORAGE_KEY = 'ope_osakidetza_v6';
     const DEFAULT_STATE = {
       questionStats: {},
       failedQuestionIds: [],
       sessions: [],
-      settings: { shuffleAnswers: true, shuffleInitialized: false },
+      settings: { shuffleAnswers: true, shuffleInitialized: true },
       lastQuizConfig: null,
       lastSyncedAt: null,
       inProgressQuiz: null
@@ -889,7 +1032,16 @@
       all: 'Toda la batería',
       common: 'COMÚN C2, C3, D y E',
       admin: 'Temario Específico',
-      failed: 'Falladas'
+      failed: 'Falladas',
+      simulacro: 'Simulacro Oficial'
+    };
+
+    const SIMULACRO_CONFIG = {
+      questions: 100,
+      timeMinutes: 110,
+      correctPoints: 1,
+      wrongPoints: -0.25,
+      blankPoints: 0
     };
 
     let state = loadState();
@@ -900,6 +1052,7 @@
     let currentQuizSnapshot = null;
     let syncDirty = false;
     let syncInFlight = false;
+    let timerInterval = null;
 
     const byId = (id) => document.getElementById(id);
     const views = [...document.querySelectorAll('.section')];
@@ -1000,9 +1153,33 @@
       return state.questionStats[id];
     }
 
+    function getSelectedBanks(prefix){
+      const adminChecked = byId(`${prefix}-bank-admin`).checked;
+      const commonChecked = byId(`${prefix}-bank-common`).checked;
+      const banks = [];
+      if(adminChecked) banks.push('admin');
+      if(commonChecked) banks.push('common');
+      return banks;
+    }
+
     function startRandomFromSelect(){
       const count = Number(byId('random-count').value);
-      startRandomQuiz(count);
+      const banks = getSelectedBanks('random');
+      
+      if(banks.length === 0){
+        toast('⚠️ Selecciona al menos un banco de preguntas');
+        return;
+      }
+
+      const pool = QUESTIONS.filter(q => banks.includes(q.bank));
+      if(pool.length === 0){
+        toast('⚠️ No hay preguntas disponibles para esa selección');
+        return;
+      }
+
+      const selected = shuffleArray([...pool]).slice(0, count);
+      const bankLabel = banks.length === 2 ? 'Específico + Común' : banks[0] === 'admin' ? 'Específico' : 'Común';
+      launchQuiz(selected, { type:'random', count, bank:'all', label:`Aleatorio ${bankLabel} (${selected.length})` });
     }
 
     function startRandomQuiz(count){
@@ -1026,20 +1203,88 @@
       launchQuiz(selected, { type:'failed', bank:'failed', label:`Falladas (${selected.length})` });
     }
 
+    function startSimulacro(){
+      const banks = getSelectedBanks('simulacro');
+      
+      if(banks.length === 0){
+        toast('⚠️ Selecciona al menos un banco de preguntas');
+        return;
+      }
+
+      const pool = QUESTIONS.filter(q => banks.includes(q.bank));
+      if(pool.length < SIMULACRO_CONFIG.questions){
+        toast(`⚠️ No hay suficientes preguntas. Disponibles: ${pool.length}`);
+        return;
+      }
+
+      const selected = shuffleArray([...pool]).slice(0, SIMULACRO_CONFIG.questions);
+      const bankLabel = banks.length === 2 ? 'Específico + Común' : banks[0] === 'admin' ? 'Específico' : 'Común';
+      
+      launchQuiz(selected, { 
+        type:'simulacro', 
+        bank:'simulacro', 
+        label:`Simulacro ${bankLabel}`,
+        timeLimit: SIMULACRO_CONFIG.timeMinutes * 60,
+        startTime: Date.now()
+      });
+    }
+
     function launchQuiz(questions, config){
       if(!questions.length){ toast('⚠️ No hay preguntas disponibles'); return; }
+      
       currentQuiz = {
         config,
         questions,
         index: 0,
         results: [],
-        optionOrders: {}
+        optionOrders: {},
+        userAnswers: {}
       };
+      
       currentQuizSnapshot = null;
       state.lastQuizConfig = config;
       persistCurrentQuiz();
       showView('quiz');
       renderQuestion();
+
+      if(config.type === 'simulacro'){
+        startTimer();
+      }
+    }
+
+    function startTimer(){
+      clearInterval(timerInterval);
+      const timerEl = byId('quiz-timer');
+      const displayEl = byId('timer-display');
+      timerEl.style.display = 'inline-flex';
+
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - currentQuiz.config.startTime) / 1000);
+        const remaining = currentQuiz.config.timeLimit - elapsed;
+
+        if(remaining <= 0){
+          clearInterval(timerInterval);
+          displayEl.textContent = '00:00';
+          timerEl.classList.add('expired');
+          toast('⏰ Tiempo agotado');
+          setTimeout(() => finishSimulacro(true), 1000);
+          return;
+        }
+
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        displayEl.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+
+        if(remaining <= 60){
+          timerEl.classList.add('expired');
+        }
+      }, 1000);
+    }
+
+    function stopTimer(){
+      clearInterval(timerInterval);
+      byId('quiz-timer').style.display = 'none';
+      byId('quiz-timer').classList.remove('expired');
     }
 
     function persistCurrentQuiz(){
@@ -1054,7 +1299,8 @@
         questionIds: currentQuiz.questions.map(q => q.id),
         index: currentQuiz.index,
         results: currentQuiz.results,
-        optionOrders: currentQuiz.optionOrders
+        optionOrders: currentQuiz.optionOrders,
+        userAnswers: currentQuiz.userAnswers || {}
       };
       saveState();
     }
@@ -1080,15 +1326,23 @@
         questions,
         index: saved.index || 0,
         results: Array.isArray(saved.results) ? saved.results : [],
-        optionOrders: saved.optionOrders || {}
+        optionOrders: saved.optionOrders || {},
+        userAnswers: saved.userAnswers || {}
       };
+      
       currentQuizSnapshot = null;
       showView('quiz');
       renderQuestion();
 
+      if(currentQuiz.config.type === 'simulacro'){
+        startTimer();
+      }
+
       const currentQ = currentQuiz.questions[currentQuiz.index];
       const existing = currentQuiz.results.find(r => r.questionId === currentQ?.id);
-      if(existing) renderAnsweredCurrentQuestion(existing);
+      if(existing && currentQuiz.config.type !== 'simulacro') {
+        renderAnsweredCurrentQuestion(existing);
+      }
     }
 
     function renderResumeBox(){
@@ -1101,9 +1355,11 @@
 
       const total = saved.questionIds.length;
       const currentPos = (saved.index || 0) + 1;
+      const isSimulacro = saved.config?.type === 'simulacro';
+      
       box.innerHTML = `
         <div class="review-item">
-          <h4>📝 Test en curso</h4>
+          <h4>${isSimulacro ? '⏱️' : '📝'} Test en curso</h4>
           <div class="muted mini">${saved.config?.label || 'Sesión'} · pregunta ${currentPos} de ${total}</div>
           <div class="btn-row" style="margin-top:12px">
             <button class="btn primary" onclick="restoreQuizFromState()">▶️ Continuar</button>
@@ -1114,6 +1370,7 @@
     }
 
     async function discardCurrentQuiz(){
+      stopTimer();
       currentQuiz = null;
       state.inProgressQuiz = null;
       saveState();
@@ -1125,8 +1382,14 @@
     function renderQuestion(){
       const q = currentQuiz.questions[currentQuiz.index];
       const total = currentQuiz.questions.length;
+      const isSimulacro = currentQuiz.config.type === 'simulacro';
+      
       byId('quiz-bank-badge').textContent = q.bankLabel;
       byId('quiz-mode-badge').textContent = currentQuiz.config.label;
+      if(isSimulacro){
+        byId('quiz-mode-badge').classList.add('warning');
+      }
+      
       byId('quiz-counter').textContent = `Pregunta ${currentQuiz.index + 1} de ${total}`;
       byId('quiz-progress').style.width = `${((currentQuiz.index) / total) * 100}%`;
       byId('quiz-question').textContent = `${q.number}. ${q.text}`;
@@ -1134,6 +1397,7 @@
       byId('quiz-feedback').innerHTML = '';
       byId('quiz-next').style.display = 'none';
       byId('quiz-finish').style.display = 'none';
+      byId('quiz-finish-simulacro').style.display = 'none';
 
       if(!currentQuiz.optionOrders[q.id]){
         const opts = q.options.map(opt => ({...opt}));
@@ -1148,6 +1412,13 @@
       renderOptions.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'opt';
+        
+        const selectedAnswer = currentQuiz.userAnswers[q.id];
+        if(selectedAnswer === opt.id){
+          btn.style.borderColor = 'var(--primary)';
+          btn.style.background = 'var(--primary-soft)';
+        }
+        
         btn.innerHTML = `<span class="letter">${letters[idx]}</span><span>${opt.text}</span>`;
         btn.onclick = () => answerQuestion(opt.id);
         list.appendChild(btn);
@@ -1156,13 +1427,20 @@
       persistCurrentQuiz();
 
       const existing = currentQuiz.results.find(r => r.questionId === q.id);
-      if(existing) renderAnsweredCurrentQuestion(existing);
+      if(existing && !isSimulacro) {
+        renderAnsweredCurrentQuestion(existing);
+      } else if(isSimulacro){
+        const isLast = currentQuiz.index === currentQuiz.questions.length - 1;
+        byId('quiz-next').style.display = isLast ? 'none' : 'inline-flex';
+        byId('quiz-finish-simulacro').style.display = isLast ? 'inline-flex' : 'none';
+      }
     }
 
     function renderAnsweredCurrentQuestion(result){
       const q = currentQuiz.questions[currentQuiz.index];
       const buttons = [...byId('quiz-options').querySelectorAll('.opt')];
       const optionOrder = currentQuiz.optionOrders[q.id] || [];
+      
       buttons.forEach((btn, idx) => {
         btn.disabled = true;
         const opt = optionOrder[idx];
@@ -1185,6 +1463,15 @@
 
     async function answerQuestion(selectedOptionId){
       const q = currentQuiz.questions[currentQuiz.index];
+      const isSimulacro = currentQuiz.config.type === 'simulacro';
+
+      if(isSimulacro){
+        currentQuiz.userAnswers[q.id] = selectedOptionId;
+        persistCurrentQuiz();
+        renderQuestion();
+        return;
+      }
+
       const alreadyAnswered = currentQuiz.results.find(r => r.questionId === q.id);
       if(alreadyAnswered){
         renderAnsweredCurrentQuestion(alreadyAnswered);
@@ -1249,22 +1536,132 @@
       byId('result-score').textContent = `${correct}/${total}`;
       byId('result-pct').textContent = `${pct}%`;
       byId('result-fails').textContent = `${wrong}`;
+      byId('simulacro-result').style.display = 'none';
       renderResultsReview();
       showView('results');
       await syncNow(false);
       currentQuiz = null;
     }
 
-    function renderResultsReview(){
+    async function finishSimulacro(autoFinish = false){
+      stopTimer();
+
+      const total = currentQuiz.questions.length;
+      let correct = 0;
+      let wrong = 0;
+      let blank = 0;
+
+      currentQuiz.questions.forEach(q => {
+        const userAnswer = currentQuiz.userAnswers[q.id];
+        
+        if(!userAnswer){
+          blank++;
+          return;
+        }
+
+        const isCorrect = userAnswer === q.correctOptionId;
+        const stat = getQuestionStat(q.id);
+        stat.attempts += 1;
+        
+        if(isCorrect){
+          stat.correct += 1;
+          correct++;
+        } else {
+          stat.wrong += 1;
+          wrong++;
+          const failedSet = new Set(state.failedQuestionIds);
+          failedSet.add(q.id);
+          state.failedQuestionIds = [...failedSet];
+        }
+
+        currentQuiz.results.push({
+          questionId: q.id,
+          correct: isCorrect,
+          selectedOptionId: userAnswer,
+          correctOptionId: q.correctOptionId
+        });
+      });
+
+      const finalScore = (correct * SIMULACRO_CONFIG.correctPoints) + 
+                        (wrong * SIMULACRO_CONFIG.wrongPoints) + 
+                        (blank * SIMULACRO_CONFIG.blankPoints);
+
+      const pct = total ? Math.round((correct / total) * 100) : 0;
+      const elapsed = Math.floor((Date.now() - currentQuiz.config.startTime) / 1000);
+      const timeUsed = Math.floor(elapsed / 60);
+
+      currentQuizSnapshot = {
+        questions: [...currentQuiz.questions],
+        results: [...currentQuiz.results],
+        userAnswers: {...currentQuiz.userAnswers}
+      };
+
+      state.sessions.unshift({
+        at: new Date().toISOString(),
+        label: `${currentQuiz.config.label} ${autoFinish ? '(tiempo agotado)' : ''}`,
+        total,
+        correct,
+        wrong,
+        blank,
+        finalScore,
+        pct,
+        timeUsed,
+        isSimulacro: true
+      });
+      state.sessions = state.sessions.slice(0, 25);
+      state.inProgressQuiz = null;
+      saveState();
+
+      byId('result-score').textContent = `${correct}/${total}`;
+      byId('result-pct').textContent = `${pct}%`;
+      byId('result-fails').textContent = `${wrong}`;
+      
+      byId('simulacro-final-score').textContent = finalScore.toFixed(2);
+      byId('simulacro-blanks').textContent = blank;
+      byId('simulacro-time-used').textContent = `${timeUsed}m`;
+      byId('simulacro-result').style.display = 'block';
+
+      renderResultsReview(true);
+      showView('results');
+      await syncNow(false);
+      currentQuiz = null;
+    }
+
+    function renderResultsReview(isSimulacro = false){
       const wrap = byId('results-review');
       wrap.innerHTML = '<h3>🔍 Revisión</h3>';
 
       const sourceQuestions = currentQuizSnapshot?.questions || [];
       const sourceResults = currentQuizSnapshot?.results || [];
+      const sourceAnswers = currentQuizSnapshot?.userAnswers || {};
 
       sourceQuestions.forEach((q, idx) => {
-        const res = sourceResults[idx];
-        if(!res) return;
+        let res = sourceResults.find(r => r.questionId === q.id);
+        
+        if(isSimulacro && !res){
+          const userAnswer = sourceAnswers[q.id];
+          if(userAnswer){
+            res = {
+              questionId: q.id,
+              correct: userAnswer === q.correctOptionId,
+              selectedOptionId: userAnswer,
+              correctOptionId: q.correctOptionId
+            };
+          }
+        }
+
+        if(!res){
+          const item = document.createElement('div');
+          item.className = 'review-item';
+          item.innerHTML = `
+            <h4>${q.number}. ${q.text}</h4>
+            <div class="mini muted"><strong>Sin responder (en blanco)</strong></div>
+            <div class="mini muted" style="margin-top:8px"><strong>Correcta:</strong> ${q.options.find(o => o.id === q.correctOptionId)?.text || '-'}</div>
+          `;
+          wrap.appendChild(item);
+          return;
+        }
+
         const selectedText = q.options.find(o => o.id === res.selectedOptionId)?.text || '-';
         const correctText = q.options.find(o => o.id === res.correctOptionId)?.text || '-';
         const item = document.createElement('div');
@@ -1285,9 +1682,11 @@
       if(cfg.type === 'random') return startRandomQuiz(cfg.count || 20);
       if(cfg.type === 'block') return startBlockQuiz(cfg.bank, cfg.block);
       if(cfg.type === 'failed') return startFailedReview();
+      if(cfg.type === 'simulacro') return startSimulacro();
     }
 
     async function leaveQuiz(){
+      stopTimer();
       persistCurrentQuiz();
       await syncNow(false);
       currentQuiz = null;
@@ -1376,7 +1775,8 @@
         state.sessions.slice(0,10).forEach(s => {
           const item = document.createElement('div');
           item.className = 'review-item';
-          item.innerHTML = `<h4>${s.label}</h4><div class="muted">${new Date(s.at).toLocaleString()} · ${s.correct}/${s.total} · ${s.pct}%</div>`;
+          const extra = s.isSimulacro ? ` · Puntuación: ${s.finalScore?.toFixed(2) || 0} · En blanco: ${s.blank || 0}` : '';
+          item.innerHTML = `<h4>${s.isSimulacro ? '⏱️' : '📝'} ${s.label}</h4><div class="muted">${new Date(s.at).toLocaleString()} · ${s.correct}/${s.total} · ${s.pct}%${extra}</div>`;
           sessions.appendChild(item);
         });
       }
@@ -1730,6 +2130,7 @@
 
     window.addEventListener('beforeunload', () => {
       try{
+        stopTimer();
         if(currentQuiz) persistCurrentQuiz();
         if(currentUser) pushRemoteState();
       }catch(e){
