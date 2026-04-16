@@ -1,6 +1,4 @@
-from pathlib import Path
-
-html = r'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -356,6 +354,8 @@ html = r'''<!DOCTYPE html>
     let supabaseClient = null;
     let deferredInstallPrompt = null;
     let currentQuizSnapshot = null;
+    let syncDirty = false;
+    let syncInFlight = false;
 
     const byId = (id) => document.getElementById(id);
     const views = [...document.querySelectorAll('.section')];
@@ -373,6 +373,7 @@ html = r'''<!DOCTYPE html>
       setupInstallPrompt();
       renderResumeBox();
       lockAppUntilAuth();
+      startAutoSync();
     }
 
     function loadState(){
@@ -386,7 +387,8 @@ html = r'''<!DOCTYPE html>
       }
     }
 
-    function saveState(){
+    function saveState(markDirty = true){
+      if(markDirty) syncDirty = true;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       refreshAllUi();
       renderResumeBox();
@@ -437,7 +439,7 @@ html = r'''<!DOCTYPE html>
       byId('shuffle-toggle').checked = !!state.settings.shuffleAnswers;
       byId('shuffle-toggle').addEventListener('change', async (e) => {
         state.settings.shuffleAnswers = e.target.checked;
-        saveState();
+        saveState(false);
         await syncNow(false);
         toast(e.target.checked ? 'Shuffle activado' : 'Shuffle desactivado');
       });
@@ -1032,7 +1034,8 @@ html = r'''<!DOCTYPE html>
       if(remoteUpdatedAt >= localUpdatedAt){
         state = deepMerge(structuredClone(DEFAULT_STATE), data.payload);
         state.lastSyncedAt = data.updated_at;
-        saveState();
+        syncDirty = false;
+        saveState(false);
       } else {
         await pushRemoteState();
       }
@@ -1066,7 +1069,8 @@ html = r'''<!DOCTYPE html>
       }
 
       state.lastSyncedAt = nowIso;
-      saveState();
+      syncDirty = false;
+      saveState(false);
       renderSyncStatus();
       return true;
     }
@@ -1079,6 +1083,23 @@ html = r'''<!DOCTYPE html>
       const ok = await pushRemoteState();
       if(ok && showToast) toast('Sincronizado');
       return ok;
+    }
+
+    async function syncIfNeeded(){
+      if(!currentUser || !supabaseClient) return false;
+      if(!syncDirty || syncInFlight) return false;
+      syncInFlight = true;
+      try{
+        return await pushRemoteState();
+      } finally {
+        syncInFlight = false;
+      }
+    }
+
+    function startAutoSync(){
+      setInterval(() => {
+        syncIfNeeded();
+      }, 1000);
     }
 
     function renderSyncStatus(){
@@ -1168,6 +1189,5 @@ html = r'''<!DOCTYPE html>
   </script>
 </body>
 </html>
-'''
 
 
