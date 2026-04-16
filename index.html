@@ -1,11 +1,16 @@
-<!DOCTYPE html>
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OPE Osakidetza Test</title>
   <meta name="theme-color" content="#b91c1c" />
-  <meta name="description" content="App de test para OPE Osakidetza con práctica por bloques, falladas y sincronización opcional." />
+  <meta name="description" content="App de test para OPE Osakidetza con práctica por bloques, falladas y sincronización." />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <style>
     :root{
@@ -16,7 +21,6 @@
       --text:#edf2f7;
       --muted:#9fb0cc;
       --accent:#dc2626;
-      --accent-2:#ef4444;
       --good:#16a34a;
       --bad:#dc2626;
       --warn:#f59e0b;
@@ -26,13 +30,8 @@
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:linear-gradient(180deg,#08101d 0%,#0b1220 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100%}
     body{padding-bottom:64px}
-    a{color:inherit}
     .wrap{max-width:980px;margin:0 auto;padding:16px}
-    header{
-      background:linear-gradient(135deg,#991b1b,#7f1d1d 60%,#111827);
-      border-bottom:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow);
-    }
+    header{background:linear-gradient(135deg,#991b1b,#7f1d1d 60%,#111827);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow)}
     .hero{padding:28px 16px 22px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
     .brand h1{margin:0;font-size:clamp(1.5rem,3.2vw,2.2rem)}
     .brand p{margin:6px 0 0;color:#fecaca;font-size:.95rem}
@@ -58,7 +57,6 @@
     .btn.primary{background:var(--accent)}
     .btn.good{background:var(--good)}
     .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
-    .btn.warn{background:var(--warn);color:#111827}
     .btn-row{display:flex;flex-wrap:wrap;gap:10px}
     .pill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
     .pill-btn{padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-weight:800;text-align:left;cursor:pointer}
@@ -91,81 +89,46 @@
     .mini{font-size:.9rem}
     .footer-note{font-size:.9rem;color:var(--muted);margin-top:10px;line-height:1.6}
     #install-banner{display:none;position:fixed;left:16px;right:16px;bottom:16px;z-index:20;background:#111827;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
-    #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#111827;border:1px solid var(--border);padding:10px 14px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:30}
+    #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#111827;border:1px solid var(--border);padding:10px 14px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:50}
     #toast.show{opacity:1}
-
-    .auth-gate{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      background:
-        radial-gradient(circle at top right, rgba(220,38,38,.24), transparent 28%),
-        radial-gradient(circle at bottom left, rgba(59,130,246,.14), transparent 22%),
-        linear-gradient(180deg,#08101d 0%,#0b1220 100%);
-    }
-    .auth-card{
-      width:min(100%, 460px);
-      background:rgba(18,26,43,.96);
-      border:1px solid var(--border);
-      border-radius:24px;
-      padding:26px;
-      box-shadow:var(--shadow);
-    }
-    .auth-logo{
-      width:64px;
-      height:64px;
-      border-radius:18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:linear-gradient(135deg,#dc2626,#7f1d1d);
-      font-size:1.4rem;
-      font-weight:900;
-      margin-bottom:16px;
-    }
-    .auth-title{margin:0 0 8px;font-size:clamp(1.6rem,3.4vw,2.1rem)}
-    .auth-subtitle{margin:0 0 20px;color:var(--muted);line-height:1.6}
-    .auth-footer{margin-top:14px;color:var(--muted);font-size:.88rem;line-height:1.6}
-    .auth-user-box{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      background:rgba(255,255,255,.08);
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.1);
-      font-size:.9rem;
-    }
-
+    .auth-shell{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at top, rgba(220,38,38,.15), rgba(8,16,29,.98) 45%), linear-gradient(180deg,#08101d 0%,#0b1220 100%)}
+    .auth-shell.hidden{display:none}
+    .auth-card{width:min(460px,100%);background:rgba(18,26,43,.96);border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow);padding:28px}
+    .auth-title{font-size:clamp(1.7rem,4vw,2.4rem);margin:0}
+    .auth-sub{margin:10px 0 20px;color:#fecaca;line-height:1.6}
+    .auth-logo{width:68px;height:68px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#b91c1c,#7f1d1d);font-size:1.7rem;font-weight:900;box-shadow:var(--shadow);margin-bottom:16px}
+    .auth-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .auth-help{margin-top:14px;font-size:.92rem;color:var(--muted);line-height:1.6}
+    .auth-status{margin:10px 0 0;font-size:.92rem}
   </style>
 </head>
 <body>
-  <div id="auth-gate" class="auth-gate">
+  <div id="auth-gate" class="auth-shell">
     <div class="auth-card">
       <div class="auth-logo">OPE</div>
-      <h1 class="auth-title">Accede a la app</h1>
-      <p class="auth-subtitle">Entra con tu usuario y contraseña para abrir la app en pantalla completa y sincronizar el progreso entre PC y Android.</p>
+      <h1 class="auth-title">Acceso</h1>
+      <p class="auth-sub">Entra con tu usuario y contraseña para abrir la app y sincronizar tu progreso entre PC y Android.</p>
+
       <div class="form-grid">
-        <input id="gate-user" class="input" placeholder="Usuario" type="text" autocomplete="username" />
-        <input id="gate-password" class="input" placeholder="Contraseña" type="password" autocomplete="current-password" />
+        <input id="gate-user" class="input" placeholder="Usuario" type="text" />
+        <input id="gate-password" class="input" placeholder="Contraseña" type="password" />
       </div>
-      <div class="btn-row" style="margin-top:14px">
-        <button class="btn primary" onclick="gateSignIn()">Entrar</button>
-        <button class="btn" onclick="gateSignUp()">Crear cuenta</button>
+
+      <div class="auth-actions">
+        <button class="btn primary" onclick="signIn()">Entrar</button>
+        <button class="btn" onclick="signUp()">Crear cuenta</button>
       </div>
-      <div id="auth-gate-status" class="auth-footer"></div>
+
+      <div id="auth-status" class="auth-status muted">Introduce tus datos para continuar.</div>
+      <div class="auth-help">Si ya tienes cuenta, usa exactamente el mismo usuario y contraseña en todos tus dispositivos.</div>
     </div>
   </div>
 
-  <div id="app-shell" style="display:none;">
-
-  <header>
+  <header id="app-shell">
     <div class="wrap hero">
       <div class="brand">
         <h1>OPE Osakidetza Test</h1>
-        <p>PC + Android · bloques de 50 · falladas · shuffle de respuestas</p>
+        <p>PC + Android · bloques de 50 · falladas · sincronización online</p>
       </div>
       <div class="top-actions">
         <label class="switch"><input type="checkbox" id="shuffle-toggle" /> <span>Shuffle respuestas</span></label>
@@ -182,7 +145,7 @@
       <button class="tab" data-view="common">Común C2-C3-D-E</button>
       <button class="tab" data-view="failed">Falladas</button>
       <button class="tab" data-view="stats">Estadísticas</button>
-      <button class="tab" data-view="sync">Sync</button>
+      <button class="tab" data-view="sync">Cuenta</button>
     </div>
   </nav>
 
@@ -193,6 +156,7 @@
         <div class="stat"><div class="n" id="stat-accuracy">0%</div><div class="l">Acierto global</div></div>
         <div class="stat"><div class="n" id="stat-failed">0</div><div class="l">Pendientes en falladas</div></div>
       </div>
+
       <div class="grid grid-2" style="margin-top:16px">
         <div class="card">
           <h2>Empezar rápido</h2>
@@ -201,16 +165,17 @@
             <button class="btn" onclick="startRandomQuiz(50)">50 aleatorias</button>
             <button class="btn ghost" onclick="startFailedReview()">Repasar falladas</button>
           </div>
-          <p class="footer-note">El modo shuffle cambia el orden visual de las respuestas en cada pregunta sin romper la correcta.</p>
+          <div id="resume-box" style="margin-top:14px"></div>
+          <p class="footer-note">Se guarda el progreso local y, si has iniciado sesión, también se sincroniza automáticamente online.</p>
         </div>
+
         <div class="card">
           <h2>Qué hace esta versión</h2>
           <ul class="muted mini" style="line-height:1.8; padding-left:18px; margin:0">
-            <li>Todo aleatorio de toda la batería.</li>
-            <li>Temario Específico en bloques de 50.</li>
-            <li>Común C2, C3, D y E en bloques de 50.</li>
-            <li>Almacén de falladas con repaso.</li>
-            <li>Sincronización opcional con Supabase.</li>
+            <li>Guarda estadísticas y falladas.</li>
+            <li>Guarda el test en curso para retomarlo.</li>
+            <li>Sincroniza online al contestar, salir y finalizar.</li>
+            <li>Usuario + contraseña en pantalla completa antes de entrar.</li>
           </ul>
         </div>
       </div>
@@ -219,7 +184,7 @@
     <section id="random" class="section">
       <div class="card">
         <h2>Todo aleatorio</h2>
-        <p class="muted">Mezcla las 500 preguntas y lanza una sesión nueva.</p>
+        <p class="muted">Mezcla toda la batería y lanza una sesión nueva.</p>
         <div class="form-grid" style="margin-top:14px">
           <select id="random-count" class="select">
             <option value="10">10 preguntas</option>
@@ -285,27 +250,25 @@
     <section id="sync" class="section">
       <div class="grid grid-2">
         <div class="card">
-          <h2>Sincronización</h2>
-          <p class="muted">Aquí puedes ver tu cuenta actual y volver a sincronizar manualmente cuando quieras.</p>
+          <h2>Cuenta</h2>
+          <p class="muted">Tu progreso se vincula a este usuario.</p>
           <div id="sync-status" class="mini" style="margin:12px 0"></div>
-          <div class="form-grid">
-            <input id="auth-user" class="input" placeholder="Usuario" type="text" />
-            <input id="auth-password" class="input" placeholder="Contraseña" type="password" />
-          </div>
           <div class="btn-row" style="margin-top:12px">
-            <button class="btn primary" onclick="signIn()">Entrar</button>
-            <button class="btn" onclick="signUp()">Crear cuenta</button>
             <button class="btn ghost" onclick="syncNow()">Sincronizar ahora</button>
             <button class="btn ghost" onclick="signOut()">Salir</button>
           </div>
         </div>
+
         <div class="card">
           <h2>Copias locales</h2>
           <div class="btn-row">
             <button class="btn ghost" onclick="exportState()">Exportar progreso</button>
-            <label class="btn ghost" style="display:inline-flex;align-items:center;cursor:pointer">Importar progreso<input type="file" accept="application/json" hidden onchange="importState(event)"></label>
+            <label class="btn ghost" style="display:inline-flex;align-items:center;cursor:pointer">
+              Importar progreso
+              <input type="file" accept="application/json" hidden onchange="importState(event)">
+            </label>
           </div>
-          <p class="footer-note">Aunque no configures sync, siempre tendrás guardado local y copia exportable.</p>
+          <p class="footer-note">Aunque se sincroniza online, puedes seguir guardando copias locales.</p>
         </div>
       </div>
     </section>
@@ -348,8 +311,6 @@
     </section>
   </main>
 
-  </div>
-
   <div id="install-banner">
     <div class="btn-row" style="justify-content:space-between;align-items:center">
       <div>
@@ -362,22 +323,24 @@
       </div>
     </div>
   </div>
+
   <div id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./app-config.js"></script>
-  <script src="./questions-data.js"></script>
+  <script src="./app-config.js?v=20"></script>
+  <script src="./questions-data.js?v=20"></script>
   <script>
     window.APP_CONFIG = window.APP_CONFIG || { SUPABASE_URL:'', SUPABASE_ANON_KEY:'' };
 
-    const STORAGE_KEY = 'ope_osakidetza_v3';
+    const STORAGE_KEY = 'ope_osakidetza_v5';
     const DEFAULT_STATE = {
       questionStats: {},
       failedQuestionIds: [],
       sessions: [],
       settings: { shuffleAnswers: false },
       lastQuizConfig: null,
-      lastSyncedAt: null
+      lastSyncedAt: null,
+      inProgressQuiz: null
     };
 
     const BANK_LABELS = {
@@ -392,6 +355,7 @@
     let currentUser = null;
     let supabaseClient = null;
     let deferredInstallPrompt = null;
+    let currentQuizSnapshot = null;
 
     const byId = (id) => document.getElementById(id);
     const views = [...document.querySelectorAll('.section')];
@@ -405,8 +369,10 @@
       bindSettings();
       initSync();
       refreshAllUi();
-      registerServiceWorker();
+      cleanupOldServiceWorkers();
       setupInstallPrompt();
+      renderResumeBox();
+      lockAppUntilAuth();
     }
 
     function loadState(){
@@ -423,6 +389,7 @@
     function saveState(){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       refreshAllUi();
+      renderResumeBox();
     }
 
     function deepMerge(base, extra){
@@ -468,9 +435,10 @@
 
     function bindSettings(){
       byId('shuffle-toggle').checked = !!state.settings.shuffleAnswers;
-      byId('shuffle-toggle').addEventListener('change', (e) => {
+      byId('shuffle-toggle').addEventListener('change', async (e) => {
         state.settings.shuffleAnswers = e.target.checked;
         saveState();
+        await syncNow(false);
         toast(e.target.checked ? 'Shuffle activado' : 'Shuffle desactivado');
       });
     }
@@ -515,9 +483,91 @@
         results: [],
         optionOrders: {}
       };
+      currentQuizSnapshot = null;
       state.lastQuizConfig = config;
+      persistCurrentQuiz();
       showView('quiz');
       renderQuestion();
+    }
+
+    function persistCurrentQuiz(){
+      if(!currentQuiz){
+        state.inProgressQuiz = null;
+        saveState();
+        return;
+      }
+
+      state.inProgressQuiz = {
+        config: currentQuiz.config,
+        questionIds: currentQuiz.questions.map(q => q.id),
+        index: currentQuiz.index,
+        results: currentQuiz.results,
+        optionOrders: currentQuiz.optionOrders
+      };
+      saveState();
+    }
+
+    function restoreQuizFromState(){
+      const saved = state.inProgressQuiz;
+      if(!saved || !saved.questionIds?.length){
+        toast('No hay test en curso');
+        return;
+      }
+
+      const questions = saved.questionIds
+        .map(id => QUESTIONS.find(q => q.id === id))
+        .filter(Boolean);
+
+      if(!questions.length){
+        toast('No se pudo recuperar el test');
+        return;
+      }
+
+      currentQuiz = {
+        config: saved.config,
+        questions,
+        index: saved.index || 0,
+        results: Array.isArray(saved.results) ? saved.results : [],
+        optionOrders: saved.optionOrders || {}
+      };
+      currentQuizSnapshot = null;
+      showView('quiz');
+      renderQuestion();
+
+      const currentQ = currentQuiz.questions[currentQuiz.index];
+      const existing = currentQuiz.results.find(r => r.questionId === currentQ?.id);
+      if(existing) renderAnsweredCurrentQuestion(existing);
+    }
+
+    function renderResumeBox(){
+      const box = byId('resume-box');
+      const saved = state.inProgressQuiz;
+      if(!saved || !saved.questionIds?.length){
+        box.innerHTML = '';
+        return;
+      }
+
+      const total = saved.questionIds.length;
+      const currentPos = (saved.index || 0) + 1;
+      box.innerHTML = `
+        <div class="review-item">
+          <h4>Test en curso</h4>
+          <div class="muted mini">${saved.config?.label || 'Sesión'} · pregunta ${currentPos} de ${total}</div>
+          <div class="btn-row" style="margin-top:10px">
+            <button class="btn primary" onclick="restoreQuizFromState()">Continuar</button>
+            <button class="btn ghost" onclick="discardCurrentQuiz()">Descartar</button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function discardCurrentQuiz(){
+      currentQuiz = null;
+      state.inProgressQuiz = null;
+      saveState();
+      await syncNow(false);
+      toast('Test en curso descartado');
+      showView('home');
     }
 
     function renderQuestion(){
@@ -537,21 +587,58 @@
         const opts = q.options.map(opt => ({...opt}));
         currentQuiz.optionOrders[q.id] = state.settings.shuffleAnswers ? shuffleArray(opts) : opts;
       }
+
       const renderOptions = currentQuiz.optionOrders[q.id];
       const list = byId('quiz-options');
       list.innerHTML = '';
       const letters = ['A','B','C','D'];
+
       renderOptions.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'opt';
         btn.innerHTML = `<span class="letter">${letters[idx]}</span><span>${opt.text}</span>`;
-        btn.onclick = () => answerQuestion(opt.id, btn);
+        btn.onclick = () => answerQuestion(opt.id);
         list.appendChild(btn);
       });
+
+      persistCurrentQuiz();
+
+      const existing = currentQuiz.results.find(r => r.questionId === q.id);
+      if(existing) renderAnsweredCurrentQuestion(existing);
     }
 
-    function answerQuestion(selectedOptionId, clickedButton){
+    function renderAnsweredCurrentQuestion(result){
       const q = currentQuiz.questions[currentQuiz.index];
+      const buttons = [...byId('quiz-options').querySelectorAll('.opt')];
+      const optionOrder = currentQuiz.optionOrders[q.id] || [];
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        const opt = optionOrder[idx];
+        if(!opt) return;
+        if(opt.id === q.correctOptionId) btn.classList.add('correct');
+        if(opt.id === result.selectedOptionId && opt.id !== q.correctOptionId) btn.classList.add('wrong');
+      });
+
+      const correctText = q.options.find(o => o.id === q.correctOptionId)?.text || '';
+      const fb = byId('quiz-feedback');
+      fb.style.display = 'block';
+      fb.innerHTML = result.correct
+        ? `<strong style="color:#86efac">Correcta.</strong><br>${correctText}`
+        : `<strong style="color:#fca5a5">Incorrecta.</strong><br><span class="muted">La correcta es:</span> ${correctText}`;
+
+      const isLast = currentQuiz.index === currentQuiz.questions.length - 1;
+      byId('quiz-next').style.display = isLast ? 'none' : 'inline-flex';
+      byId('quiz-finish').style.display = isLast ? 'inline-flex' : 'none';
+    }
+
+    async function answerQuestion(selectedOptionId){
+      const q = currentQuiz.questions[currentQuiz.index];
+      const alreadyAnswered = currentQuiz.results.find(r => r.questionId === q.id);
+      if(alreadyAnswered){
+        renderAnsweredCurrentQuestion(alreadyAnswered);
+        return;
+      }
+
       const isCorrect = selectedOptionId === q.correctOptionId;
       const stat = getQuestionStat(q.id);
       stat.attempts += 1;
@@ -565,45 +652,35 @@
       }
       state.failedQuestionIds = [...failedSet];
 
-      const buttons = [...byId('quiz-options').querySelectorAll('.opt')];
-      const optionOrder = currentQuiz.optionOrders[q.id];
-      buttons.forEach((btn, idx) => {
-        btn.disabled = true;
-        const opt = optionOrder[idx];
-        if(opt.id === q.correctOptionId) btn.classList.add('correct');
-        if(opt.id === selectedOptionId && opt.id !== q.correctOptionId) btn.classList.add('wrong');
-      });
-
-      currentQuiz.results.push({
+      const result = {
         questionId: q.id,
         correct: isCorrect,
         selectedOptionId,
         correctOptionId: q.correctOptionId
-      });
+      };
 
-      const correctText = q.options.find(o => o.id === q.correctOptionId).text;
-      const fb = byId('quiz-feedback');
-      fb.style.display = 'block';
-      fb.innerHTML = isCorrect
-        ? `<strong style="color:#86efac">Correcta.</strong><br>${correctText}`
-        : `<strong style="color:#fca5a5">Incorrecta.</strong><br><span class="muted">La correcta es:</span> ${correctText}`;
-
-      const isLast = currentQuiz.index === currentQuiz.questions.length - 1;
-      byId('quiz-next').style.display = isLast ? 'none' : 'inline-flex';
-      byId('quiz-finish').style.display = isLast ? 'inline-flex' : 'none';
-      saveState();
+      currentQuiz.results.push(result);
+      renderAnsweredCurrentQuestion(result);
+      persistCurrentQuiz();
+      await syncNow(false);
     }
 
     function nextQuestion(){
       currentQuiz.index += 1;
+      persistCurrentQuiz();
       renderQuestion();
     }
 
-    function finishQuiz(){
+    async function finishQuiz(){
       const total = currentQuiz.questions.length;
       const correct = currentQuiz.results.filter(r => r.correct).length;
       const wrong = total - correct;
       const pct = total ? Math.round((correct / total) * 100) : 0;
+
+      currentQuizSnapshot = {
+        questions: [...currentQuiz.questions],
+        results: [...currentQuiz.results]
+      };
 
       state.sessions.unshift({
         at: new Date().toISOString(),
@@ -614,6 +691,7 @@
         pct
       });
       state.sessions = state.sessions.slice(0, 25);
+      state.inProgressQuiz = null;
       saveState();
 
       byId('result-score').textContent = `${correct}/${total}`;
@@ -621,14 +699,19 @@
       byId('result-fails').textContent = `${wrong}`;
       renderResultsReview();
       showView('results');
-      syncNow(false);
+      await syncNow(false);
+      currentQuiz = null;
     }
 
     function renderResultsReview(){
       const wrap = byId('results-review');
       wrap.innerHTML = '<h3>Revisión</h3>';
-      currentQuiz.questions.forEach((q, idx) => {
-        const res = currentQuiz.results[idx];
+
+      const sourceQuestions = currentQuizSnapshot?.questions || [];
+      const sourceResults = currentQuizSnapshot?.results || [];
+
+      sourceQuestions.forEach((q, idx) => {
+        const res = sourceResults[idx];
         if(!res) return;
         const selectedText = q.options.find(o => o.id === res.selectedOptionId)?.text || '-';
         const correctText = q.options.find(o => o.id === res.correctOptionId)?.text || '-';
@@ -652,9 +735,12 @@
       if(cfg.type === 'failed') return startFailedReview();
     }
 
-    function leaveQuiz(){
+    async function leaveQuiz(){
+      persistCurrentQuiz();
+      await syncNow(false);
       currentQuiz = null;
       showView('home');
+      toast('Test guardado para continuar después');
     }
 
     function renderFailedSection(){
@@ -676,10 +762,11 @@
       });
     }
 
-    function clearFailed(){
+    async function clearFailed(){
       if(!confirm('Se vaciará el apartado de falladas.')) return;
       state.failedQuestionIds = [];
       saveState();
+      await syncNow(false);
       toast('Falladas vaciadas');
       renderFailedSection();
     }
@@ -709,6 +796,7 @@
         common: { total:0, correct:0, wrong:0 },
         admin: { total:0, correct:0, wrong:0 }
       };
+
       QUESTIONS.forEach(q => {
         const s = state.questionStats[q.id];
         if(!s) return;
@@ -716,6 +804,7 @@
         bankStats[q.bank].correct += s.correct || 0;
         bankStats[q.bank].wrong += s.wrong || 0;
       });
+
       const wrap = byId('bank-stats');
       wrap.innerHTML = '';
       ['common','admin'].forEach(bank => {
@@ -754,11 +843,12 @@
       const file = event.target.files?.[0];
       if(!file) return;
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         try{
           const imported = JSON.parse(reader.result);
           state = deepMerge(structuredClone(DEFAULT_STATE), imported);
           saveState();
+          await syncNow(false);
           toast('Progreso importado');
         }catch(err){
           alert('El archivo no es válido');
@@ -770,188 +860,212 @@
 
     function usernameToEmail(username){
       const raw = String(username || '').trim().toLowerCase();
-    
-      if(raw.includes('@')){
-        return raw;
-      }
-    
-      const clean = raw
-        .replace(/\s+/g, '')
-        .replace(/[^a-z0-9._-]/g, '');
-    
+      if(raw.includes('@')) return raw;
+      const clean = raw.replace(/\s+/g, '').replace(/[^a-z0-9._-]/g, '');
       return `${clean}@amatxopo.local`;
     }
 
     function currentUsername(){
-      if(currentUser?.user_metadata?.username){
-        return currentUser.user_metadata.username;
-      }
-    
+      if(currentUser?.user_metadata?.username) return currentUser.user_metadata.username;
       const email = currentUser?.email || '';
-      if(email.endsWith('@amatxopo.local')){
-        return email.replace(/@amatxopo\.local$/,'');
-      }
-    
-      return email;
+      return email.endsWith('@amatxopo.local') ? email.replace(/@amatxopo\.local$/,'') : email;
     }
 
-    function syncCredentialInputsFromGate(){
-      const user = byId('gate-user')?.value?.trim() || '';
-      const pass = byId('gate-password')?.value || '';
-      if(byId('auth-user')) byId('auth-user').value = user;
-      if(byId('auth-password')) byId('auth-password').value = pass;
-    }
-
-    function fillGateFromSync(){
-      const user = byId('auth-user')?.value?.trim() || '';
-      const pass = byId('auth-password')?.value || '';
-      if(byId('gate-user')) byId('gate-user').value = user;
-      if(byId('gate-password')) byId('gate-password').value = pass;
-    }
-
-    function getCredentials(){
-      const gateVisible = byId('auth-gate') && getComputedStyle(byId('auth-gate')).display !== 'none';
-      if(gateVisible){
-        return {
-          username: byId('gate-user')?.value?.trim() || '',
-          password: byId('gate-password')?.value || ''
-        };
-      }
-      return {
-        username: byId('auth-user')?.value?.trim() || '',
-        password: byId('auth-password')?.value || ''
-      };
-    }
-
-    function updateAuthGate(){
-      const gate = byId('auth-gate');
-      const shell = byId('app-shell');
-      const status = byId('auth-gate-status');
-      if(!gate || !shell) return;
-
+    function lockAppUntilAuth(){
       if(currentUser){
-        gate.style.display = 'none';
-        shell.style.display = 'block';
-        if(byId('auth-user')) byId('auth-user').value = currentUsername();
-        if(status) status.innerHTML = '';
-      } else {
-        gate.style.display = 'flex';
-        shell.style.display = 'none';
-        if(status){
-          status.innerHTML = supabaseClient
-            ? 'Usa tu usuario y contraseña para entrar.'
-            : 'Falta configurar <code>app-config.js</code>.';
-        }
+        byId('auth-gate').classList.add('hidden');
+      }else{
+        byId('auth-gate').classList.remove('hidden');
       }
+    }
+
+    function setAuthStatus(text, ok=false){
+      const el = byId('auth-status');
+      el.textContent = text;
+      el.className = ok ? 'auth-status sync-ok' : 'auth-status muted';
     }
 
     function initSync(){
       if(window.APP_CONFIG.SUPABASE_URL && window.APP_CONFIG.SUPABASE_ANON_KEY && window.supabase){
-        supabaseClient = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY, {
-          auth: { persistSession: true, autoRefreshToken: true }
-        });
-        supabaseClient.auth.getUser().then(async ({ data }) => {
+        supabaseClient = window.supabase.createClient(
+          window.APP_CONFIG.SUPABASE_URL,
+          window.APP_CONFIG.SUPABASE_ANON_KEY,
+          {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true
+            }
+          }
+        );
+
+        supabaseClient.auth.getUser().then(async ({ data, error }) => {
+          if(error) console.error(error);
           currentUser = data?.user || null;
           renderSyncStatus();
-          updateAuthGate();
-          if(currentUser) await pullRemoteState();
+          lockAppUntilAuth();
+          if(currentUser) {
+            setAuthStatus(`Sesión iniciada como ${currentUsername()}`, true);
+            await pullRemoteState();
+          }
         });
 
         supabaseClient.auth.onAuthStateChange(async (_event, session) => {
           currentUser = session?.user || null;
           renderSyncStatus();
-          updateAuthGate();
-          if(currentUser) await pullRemoteState();
+          lockAppUntilAuth();
+          if(currentUser){
+            setAuthStatus(`Sesión iniciada como ${currentUsername()}`, true);
+            await pullRemoteState();
+          } else {
+            setAuthStatus('Introduce tus datos para continuar.');
+          }
         });
       }
       renderSyncStatus();
-      updateAuthGate();
     }
 
     async function signUp(){
       if(!supabaseClient) return toast('Configura app-config.js primero');
-      const { username, password } = getCredentials();
+
+      const username = byId('gate-user').value.trim();
+      const password = byId('gate-password').value.trim();
+
       if(!username) return toast('Escribe un usuario');
       if(!password) return toast('Escribe una contraseña');
 
       const email = usernameToEmail(username);
+
       const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: { data: { username } }
       });
 
-      if(error) return toast(error.message);
+      if(error){
+        console.error(error);
+        setAuthStatus(error.message);
+        return toast(error.message);
+      }
 
       if (data?.user && data?.session) {
         currentUser = data.user;
-        syncCredentialInputsFromGate();
+        setAuthStatus(`Cuenta creada y sesión iniciada como ${username}`, true);
         await pullRemoteState();
         renderSyncStatus();
-        updateAuthGate();
-        showView('home');
+        lockAppUntilAuth();
         return toast('Cuenta creada y sesión iniciada');
       }
 
+      setAuthStatus('Cuenta creada');
       toast('Cuenta creada');
     }
 
     async function signIn(){
       if(!supabaseClient) return toast('Configura app-config.js primero');
-      const { username, password } = getCredentials();
+
+      const username = byId('gate-user').value.trim();
+      const password = byId('gate-password').value.trim();
+
       if(!username) return toast('Escribe un usuario');
       if(!password) return toast('Escribe una contraseña');
 
       const email = usernameToEmail(username);
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if(error) return toast(error.message);
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if(error){
+        console.error(error);
+        setAuthStatus(error.message);
+        return toast(error.message);
+      }
+
       currentUser = data.user;
-      syncCredentialInputsFromGate();
-      toast('Sesión iniciada');
+      setAuthStatus(`Sesión iniciada como ${username}`, true);
       await pullRemoteState();
       renderSyncStatus();
-      updateAuthGate();
-      showView('home');
+      lockAppUntilAuth();
+      toast('Sesión iniciada');
     }
 
     async function signOut(){
       if(!supabaseClient) return;
-      await supabaseClient.auth.signOut();
+
+      const { error } = await supabaseClient.auth.signOut();
+      if(error){
+        console.error(error);
+        return toast(error.message);
+      }
+
       currentUser = null;
       renderSyncStatus();
-      updateAuthGate();
+      lockAppUntilAuth();
+      setAuthStatus('Sesión cerrada');
       toast('Sesión cerrada');
-    }
-
-    async function gateSignIn(){
-      syncCredentialInputsFromGate();
-      await signIn();
-    }
-
-    async function gateSignUp(){
-      syncCredentialInputsFromGate();
-      await signUp();
     }
 
     async function pullRemoteState(){
       if(!supabaseClient || !currentUser) return;
-      const { data, error } = await supabaseClient.from('app_state').select('payload,updated_at').eq('user_id', currentUser.id).maybeSingle();
-      if(error){ toast(error.message); return; }
-      if(data?.payload){
-        state = deepMerge(state, data.payload);
+
+      const { data, error } = await supabaseClient
+        .from('app_state')
+        .select('payload, updated_at')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+
+      if(error){
+        console.error(error);
+        toast(error.message);
+        return;
+      }
+
+      if(!data?.payload){
+        await pushRemoteState();
+        return;
+      }
+
+      const remoteUpdatedAt = data?.updated_at ? new Date(data.updated_at).getTime() : 0;
+      const localUpdatedAt = state.lastSyncedAt ? new Date(state.lastSyncedAt).getTime() : 0;
+
+      if(remoteUpdatedAt >= localUpdatedAt){
+        state = deepMerge(structuredClone(DEFAULT_STATE), data.payload);
+        state.lastSyncedAt = data.updated_at;
         saveState();
       } else {
         await pushRemoteState();
       }
+
       renderSyncStatus();
     }
 
     async function pushRemoteState(){
       if(!supabaseClient || !currentUser) return false;
+
       const payload = JSON.parse(JSON.stringify(state));
-      const { error } = await supabaseClient.from('app_state').upsert({ user_id: currentUser.id, payload, updated_at: new Date().toISOString() });
-      if(error){ toast(error.message); return false; }
-      state.lastSyncedAt = new Date().toISOString();
+      const nowIso = new Date().toISOString();
+
+      const { error } = await supabaseClient
+        .from('app_state')
+        .upsert(
+          {
+            user_id: currentUser.id,
+            payload,
+            updated_at: nowIso
+          },
+          {
+            onConflict: 'user_id'
+          }
+        );
+
+      if(error){
+        console.error(error);
+        toast(error.message);
+        return false;
+      }
+
+      state.lastSyncedAt = nowIso;
       saveState();
       renderSyncStatus();
       return true;
@@ -960,31 +1074,41 @@
     async function syncNow(showToast = true){
       if(!supabaseClient || !currentUser){
         if(showToast) toast('No hay sesión iniciada');
-        return;
+        return false;
       }
       const ok = await pushRemoteState();
       if(ok && showToast) toast('Sincronizado');
+      return ok;
     }
 
     function renderSyncStatus(){
       const el = byId('sync-status');
       if(!supabaseClient){
-        el.innerHTML = '<span class="sync-bad">Sync desactivado.</span> Edita <code>app-config.js</code> con tu URL y tu anon key.';
+        el.innerHTML = '<span class="sync-bad">Sync desactivado.</span> Edita <code>app-config.js</code> con tu URL y tu publishable key.';
         return;
       }
       if(!currentUser){
-        el.innerHTML = '<span class="sync-bad">Sin iniciar sesión.</span> Cuando entres, el progreso se compartirá entre dispositivos.';
+        el.innerHTML = '<span class="sync-bad">Sin iniciar sesión.</span>';
         return;
       }
-      const username = currentUsername();
-      el.innerHTML = `<span class="sync-ok">Conectado como ${username || currentUser.email}.</span><br><span class="muted">Última sync local: ${state.lastSyncedAt ? new Date(state.lastSyncedAt).toLocaleString() : 'todavía no'}</span>`;
+      el.innerHTML = `<span class="sync-ok">Conectado como ${currentUsername()}.</span><br><span class="muted">Última sync: ${state.lastSyncedAt ? new Date(state.lastSyncedAt).toLocaleString() : 'todavía no'}</span>`;
     }
 
-    function registerServiceWorker(){
-      if('serviceWorker' in navigator){
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(console.error);
-        });
+    async function cleanupOldServiceWorkers(){
+      if(!('serviceWorker' in navigator)) return;
+      try{
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for(const reg of regs){
+          await reg.unregister();
+        }
+        if(window.caches){
+          const keys = await caches.keys();
+          for(const key of keys){
+            await caches.delete(key);
+          }
+        }
+      }catch(err){
+        console.error(err);
       }
     }
 
@@ -1012,7 +1136,9 @@
       hideInstallBanner();
     }
 
-    function hideInstallBanner(){ byId('install-banner').style.display = 'none'; }
+    function hideInstallBanner(){
+      byId('install-banner').style.display = 'none';
+    }
 
     function shuffleArray(arr){
       const clone = [...arr];
@@ -1023,14 +1149,6 @@
       return clone;
     }
 
-
-    window.addEventListener('keydown', (e) => {
-      if(e.key === 'Enter' && byId('auth-gate') && getComputedStyle(byId('auth-gate')).display !== 'none'){
-        e.preventDefault();
-        gateSignIn();
-      }
-    });
-
     function toast(msg){
       const t = byId('toast');
       t.textContent = msg;
@@ -1038,6 +1156,21 @@
       clearTimeout(toast._timer);
       toast._timer = setTimeout(() => t.classList.remove('show'), 2200);
     }
+
+    window.addEventListener('beforeunload', () => {
+      try{
+        if(currentQuiz) persistCurrentQuiz();
+        if(currentUser) pushRemoteState();
+      }catch(e){
+        console.error(e);
+      }
+    });
   </script>
 </body>
 </html>
+'''
+
+path = Path("/mnt/data/index_sync_online_fixed.html")
+path.write_text(html, encoding="utf-8")
+print(f"Saved {path}")
+
