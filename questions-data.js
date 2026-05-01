@@ -1681,7 +1681,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "a) y b) son incorrectas."
       }
     ],
-    "correctOptionId": "a",
+    "correctOptionId": "c",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -2377,7 +2377,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "a) b) y c) son correctas."
       }
     ],
-    "correctOptionId": "d",
+    "correctOptionId": "a",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -2783,7 +2783,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Personal eventual."
       }
     ],
-    "correctOptionId": "c",
+    "correctOptionId": "b",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -3073,7 +3073,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Auxiliares de Enfermería."
       }
     ],
-    "correctOptionId": "d",
+    "correctOptionId": "a",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -3218,7 +3218,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Retribución extrasalarial."
       }
     ],
-    "correctOptionId": "b",
+    "correctOptionId": "a",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -3538,7 +3538,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Del Portal de Internet del Ente Público."
       }
     ],
-    "correctOptionId": "a",
+    "correctOptionId": "c",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -3886,7 +3886,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "OSATEK-Tecnología Sanitaria de Euskadi, S.A."
       }
     ],
-    "correctOptionId": "d",
+    "correctOptionId": "b",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -3915,7 +3915,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Establecer el régimen jurídico del sector público."
       }
     ],
-    "correctOptionId": "c",
+    "correctOptionId": "b",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -3944,7 +3944,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "A las Administraciones Públicas y a sus organismos autónomos."
       }
     ],
-    "correctOptionId": "b",
+    "correctOptionId": "c",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -4031,7 +4031,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "La identificación y la firma son siempre requisitos inseparables."
       }
     ],
-    "correctOptionId": "d",
+    "correctOptionId": "a",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -4205,7 +4205,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Actuarán únicamente a través de sus miembros individualmente."
       }
     ],
-    "correctOptionId": "d",
+    "correctOptionId": "c",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -4321,7 +4321,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Sustituye automáticamente a la representación."
       }
     ],
-    "correctOptionId": "b",
+    "correctOptionId": "c",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -4698,7 +4698,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Únicamente en días naturales."
       }
     ],
-    "correctOptionId": "c",
+    "correctOptionId": "a",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -4814,7 +4814,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Únicamente desde su publicación en el boletín oficial correspondiente."
       }
     ],
-    "correctOptionId": "c",
+    "correctOptionId": "a",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -4959,7 +4959,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Tutela judicial efectiva."
       }
     ],
-    "correctOptionId": "c",
+    "correctOptionId": "b",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -5336,7 +5336,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "No cabe ningún otro recurso administrativo. Solución: ANULADA EN OPE 18-19"
       }
     ],
-    "correctOptionId": "b",
+    "correctOptionId": "d",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -5626,7 +5626,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Podrán acumularse procedimientos que guarden identidad sustancial o íntima conexión."
       }
     ],
-    "correctOptionId": "b",
+    "correctOptionId": "d",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -5655,7 +5655,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Son siempre improrrogables. Solución: ANULADA EN OPE 18-19"
       }
     ],
-    "correctOptionId": "b",
+    "correctOptionId": "c",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
@@ -5742,7 +5742,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Únicamente en recurso extraordinario de revisión."
       }
     ],
-    "correctOptionId": "c",
+    "correctOptionId": "b",
     "sourceFile": "RESPUESTAS-T.-ESPECIFICO-AUXILIAR-ADMINISTRATIVOA-1.pdf"
   },
   {
