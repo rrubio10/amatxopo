@@ -7454,7 +7454,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Para el personal licenciado sanitario el complemento específico resulta irrenunciable."
       }
     ],
-    "correctOptionId": "c",
+    "correctOptionId": "b",
     "sourceFile": "RESPUESTAS-T.-COMUN-C2-C3-D-Y-E.pdf",
     "note": "IMPUGNABLE"
   },
@@ -7658,7 +7658,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Son correctas la a) y la c)."
       }
     ],
-    "correctOptionId": "c",
+    "correctOptionId": "d",
     "sourceFile": "RESPUESTAS-T.-COMUN-C2-C3-D-Y-E.pdf"
   },
   {
@@ -8702,7 +8702,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "Ninguna de las anteriores."
       }
     ],
-    "correctOptionId": "d",
+    "correctOptionId": "c",
     "sourceFile": "RESPUESTAS-T.-COMUN-C2-C3-D-Y-E.pdf"
   },
   {
