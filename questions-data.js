@@ -10965,7 +10965,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "La Ley no prevé plazo temporal alguno para la supresión de los datos del sistema de denuncias."
       }
     ],
-    "correctOptionId": "a",
+    "correctOptionId": "d",
     "sourceFile": "RESPUESTAS-T.-COMUN-C2-C3-D-Y-E.pdf"
   },
   {
