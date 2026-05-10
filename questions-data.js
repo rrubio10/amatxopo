@@ -14216,7 +14216,7 @@ const QUESTIONS = window.QUESTIONS = [
         "text": "No existe un plazo establecido para esta comunicación."
       }
     ],
-    "correctOptionId": "a",
+    "correctOptionId": "d",
     "sourceFile": "RESPUESTAS-T.-COMUN-C2-C3-D-Y-E.pdf",
     "note": "IMPUGNABLE"
   },
