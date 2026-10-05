@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#14324a" />
+  <meta name="description" content="Tests del banco oficial C1 2026 de la Diputación Foral de Gipuzkoa." />
+  <title>Amatxopo · Gipuzkoa C1 2026</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" id="homeBtn" aria-label="Inicio">
+        <span class="brand-mark">A</span>
+        <span><strong>Amatxopo</strong><small id="brandSub">Gipuzkoa C1 · 2026</small></span>
+      </button>
+      <div class="top-actions">
+        <div class="segmented compact" aria-label="Idioma">
+          <button data-lang="es" class="active">ES</button>
+          <button data-lang="eu">EU</button>
+        </div>
+        <button class="icon-btn" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">◐</button>
+      </div>
+    </header>
+
+    <main id="app" tabindex="-1"></main>
+
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <button data-view="home" class="active"><span>⌂</span><small data-i18n="navHome">Inicio</small></button>
+      <button data-view="topics"><span>☷</span><small data-i18n="navTopics">Temas</small></button>
+      <button data-view="failed"><span>↻</span><small data-i18n="navFailed">Falladas</small></button>
+      <button data-view="stats"><span>▥</span><small data-i18n="navStats">Estadísticas</small></button>
+    </nav>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script src="questions-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "Amatxopo · Gipuzkoa C1 2026",
+  "short_name": "Amatxopo C1",
+  "description": "Tests del banco oficial C1 2026 de la Diputación Foral de Gipuzkoa.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#14324a",
+  "lang": "es"
+}
